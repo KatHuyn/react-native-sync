@@ -1,5 +1,6 @@
 import { Search, FileText } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
+import { cn } from "@/lib/utils";
 
 const invoices = [
   { id: "HD-001", guest: "Nguyễn Văn An", room: "P.101", amount: "3.600.000", date: "01/04/2024", status: "paid" },
@@ -16,34 +17,49 @@ const statusMap = {
 
 const InvoicesPage = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader title="Hóa đơn" />
-      <div className="px-4 py-4 space-y-3 pb-24">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input className="w-full bg-card rounded-xl pl-9 pr-4 py-2.5 text-sm border border-border placeholder:text-muted-foreground"
+    <div className="min-h-screen bg-[#F8FAFC] animate-in fade-in duration-500 pb-24">
+      <AppHeader title="Hóa đơn" icon={FileText} variant="white" />
+      
+      <div className="px-4 py-2 space-y-2">
+        {/* Ultra-Compact Search */}
+        <div className="relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 group-focus-within:text-[#1AB1A5] transition-colors" />
+          <input className="w-full bg-white rounded-lg pl-8 pr-3 py-1.5 text-[10px] border border-slate-100 placeholder:text-slate-400 outline-none focus:ring-1 focus:ring-[#1AB1A5] shadow-sm"
             placeholder="Tìm hóa đơn..." />
         </div>
-        {invoices.map((inv) => {
-          const st = statusMap[inv.status as keyof typeof statusMap];
-          return (
-            <div key={inv.id} className="bg-card rounded-xl p-4 shadow-sm">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <span className="font-bold text-sm">{inv.id}</span>
+
+        {/* High-Density Card List */}
+        <div className="space-y-2.5">
+          {invoices.map((inv) => {
+            const st = statusMap[inv.status as keyof typeof statusMap];
+            return (
+              <div key={inv.id} className="bg-white rounded-xl p-3 shadow-sm border border-slate-50 active:scale-[0.99] transition-transform">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-[#1AB1A5]" />
+                    <span className="font-black text-[11px] text-slate-700">{inv.id}</span>
+                  </div>
+                  <span className={cn("text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-tighter", st.color)}>{st.label}</span>
                 </div>
-                <span className={`text-[10px] font-bold px-2 py-1 rounded-md ${st.color}`}>{st.label}</span>
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="font-black text-xs text-slate-800">{inv.guest}</p>
+                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">{inv.room} • {inv.date}</p>
+                  </div>
+                  <p className="text-sm font-black text-[#1AB1A5]">{inv.amount} <span className="text-[9px] opacity-60">VND</span></p>
+                </div>
               </div>
-              <p className="font-semibold">{inv.guest}</p>
-              <p className="text-xs text-muted-foreground">{inv.room} • {inv.date}</p>
-              <p className="text-lg font-bold text-primary mt-2">{inv.amount} VND</p>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-      <button className="fixed bottom-24 right-4 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center text-2xl font-light z-40">
-        +
+
+      {/* Circle FAB Button - Synchronized */}
+      <button 
+        onClick={() => {}}
+        className="fixed bottom-24 right-6 w-14 h-14 bg-[#1AB1A5] text-white rounded-full shadow-[0_12px_40px_rgba(26,177,165,0.4)] flex items-center justify-center text-3xl font-light z-[80] hover:scale-110 active:scale-95 transition-all"
+      >
+        <span>+</span>
       </button>
     </div>
   );

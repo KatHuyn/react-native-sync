@@ -1,30 +1,65 @@
-import { Bell, ChevronDown } from "lucide-react";
+import { Bell, ChevronDown, LayoutGrid, Sun, LogOut, Plus, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AppHeaderProps {
   title: string;
+  icon?: any;
+  onAddRoom?: () => void;
   branch?: string;
+  className?: string;
 }
 
-const AppHeader = ({ title, branch = "CN Sài Gòn" }: AppHeaderProps) => {
+const AppHeader = ({ 
+  title, 
+  icon: Icon = LayoutGrid, 
+  onAddRoom, 
+  branch = "Chi nhánh Hà Nội",
+  variant = "white",
+  className 
+}: AppHeaderProps & { variant?: "white" | "cyan" }) => {
+  // Always use white variant for consistency per user request, 
+  // but keeping 'isCyan' logic for internal flexibility if ever needed
+  const isCyan = variant === "cyan" && false; 
+
   return (
-    <header className="bg-primary text-primary-foreground px-4 pt-[env(safe-area-inset-top,12px)] pb-3">
+    <header className={cn(
+      "px-4 pt-6 pb-1.5 shadow-sm transition-all duration-300",
+      "bg-white text-slate-800 border-b border-slate-200",
+      className
+    )}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center overflow-hidden">
-            <span className="text-sm font-bold">PHS</span>
+        {/* Left: Sidebar Icon + Page Title - Ultra Compact */}
+        <div className="flex items-center gap-2">
+          <div className="p-1 bg-slate-50 rounded-md border border-slate-100">
+             <Icon className="w-4 h-4 text-slate-500" />
           </div>
-          <div>
-            <h1 className="text-lg font-bold leading-tight">{title}</h1>
-            <button className="flex items-center gap-1 text-primary-foreground/80 text-xs">
-              {branch} <ChevronDown className="w-3 h-3" />
-            </button>
+          <div className="flex flex-col">
+            <h1 className="text-base font-black tracking-tighter text-slate-800 leading-none">{title}</h1>
+            <div className="flex items-center gap-1 text-[8px] font-black text-slate-400 uppercase tracking-[0.1em] mt-0.5 opacity-60">
+              {branch} <ChevronDown className="w-2 h-2" />
+            </div>
           </div>
         </div>
-        <div className="relative">
-          <Bell className="w-6 h-6" />
-          <span className="absolute -top-1 -right-1 bg-cleaning text-primary-foreground text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-            3
-          </span>
+
+        {/* Right: Actions Cluster - Minimalist */}
+        <div className="flex items-center gap-1">
+          <button className="p-1.5 rounded-lg hover:bg-slate-50 transition-colors">
+            <Sun className="w-3.5 h-3.5 text-slate-400" />
+          </button>
+          <button className="relative p-1.5 rounded-lg hover:bg-slate-50 transition-colors">
+             <Bell className="w-3.5 h-3.5 text-slate-400" />
+             <span className="absolute top-1 right-1 w-2 h-2 bg-[#1AB1A5] rounded-full border border-white" />
+          </button>
+          
+          <div className="flex items-center gap-1 pl-1 ml-1 border-l border-slate-100">
+             <div className="w-6 h-6 rounded-md bg-[#1AB1A5]/10 flex items-center justify-center text-[#1AB1A5]">
+                <User className="w-3.5 h-3.5" />
+             </div>
+          </div>
+
+          <button className="p-1.5 rounded-lg hover:bg-red-50 transition-colors">
+            <LogOut className="w-3.5 h-3.5 text-red-300" />
+          </button>
         </div>
       </div>
     </header>

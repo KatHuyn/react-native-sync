@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, Building, ArrowDownLeft, ArrowUpRight, TrendingUp, Search, Calendar as CalendarIcon } from "lucide-react";
+import { CheckCircle, Building, ArrowDownLeft, ArrowUpRight, TrendingUp, Search, Calendar as CalendarIcon, LayoutDashboard } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -11,13 +11,15 @@ import { DateRange } from "react-day-picker";
 const StatCard = ({ icon: Icon, value, label, badgeText, badgeColor }: {
   icon: React.ElementType; value: string | number; label: string; badgeText: string; badgeColor: string;
 }) => (
-  <div className="bg-card rounded-xl p-4 flex flex-col gap-1 shadow-sm">
-    <div className="flex items-center justify-between">
-      <Icon className="w-5 h-5 text-muted-foreground" />
-      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeColor}`}>{badgeText}</span>
+  <div className="bg-white rounded-xl p-2.5 flex flex-col shadow-sm border border-slate-50">
+    <div className="flex items-center justify-between mb-1.5">
+      <div className={cn("p-1.5 rounded-lg", badgeColor.includes('primary') ? "bg-[#1AB1A5]/10" : "bg-slate-50")}>
+        <Icon className={cn("w-3.5 h-3.5", badgeColor.includes('primary') ? "text-[#1AB1A5]" : "text-slate-400")} />
+      </div>
+      <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-widest", badgeColor)}>{badgeText}</span>
     </div>
-    <span className="text-2xl font-bold">{value}</span>
-    <span className="text-[11px] text-muted-foreground uppercase tracking-wide">{label}</span>
+    <span className="text-xl font-black text-slate-800 leading-none">{value}</span>
+    <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-1">{label}</span>
   </div>
 );
 
@@ -142,13 +144,14 @@ const OverviewPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader title="PHS247" />
-      <div className="px-4 py-5 space-y-6 pb-24">
-        {/* Title */}
-        <div>
-          <h2 className="text-xl font-bold">Tổng quan hôm nay</h2>
-          <p className="text-sm text-muted-foreground">Thứ Hai, 22 tháng 5, 2024</p>
+    <div className="min-h-screen bg-[#F8FAFC] animate-in fade-in duration-500 pb-24">
+      <AppHeader title="PHS247" icon={LayoutDashboard} variant="white" />
+      
+      <div className="px-4 py-2 space-y-3">
+        {/* Page Title Below Header - Ultra Compact */}
+        <div className="mb-0.5">
+          <h2 className="text-base font-black text-slate-800 tracking-tighter">Tổng quan hôm nay</h2>
+          <p className="text-[7px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">Thứ Hai, 22 tháng 5, 2024</p>
         </div>
 
         {/* Stats Grid */}

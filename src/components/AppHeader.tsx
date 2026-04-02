@@ -23,7 +23,7 @@ const AppHeader = ({
 
   return (
     <header className={cn(
-      "px-4 pt-6 pb-1.5 shadow-sm transition-all duration-300",
+      "px-2 pt-2 pb-1 shadow-sm transition-all duration-300",
       "bg-white text-slate-800 border-b border-slate-200",
       className
     )}>
@@ -34,31 +34,31 @@ const AppHeader = ({
              <Icon className="w-4 h-4 text-slate-500" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-base font-black tracking-tighter text-slate-800 leading-none">{title}</h1>
-            <div className="flex items-center gap-1 text-[8px] font-black text-slate-400 uppercase tracking-[0.1em] mt-0.5 opacity-60">
-              {branch} <ChevronDown className="w-2 h-2" />
+            <h1 className="text-xs font-black tracking-tighter text-slate-800 leading-none">{title}</h1>
+            <div className="flex items-center gap-0.5 text-[7px] font-black text-slate-400 uppercase tracking-tighter mt-0.5 opacity-60">
+              {branch} <ChevronDown className="w-1.5 h-1.5" />
             </div>
           </div>
         </div>
 
         {/* Right: Actions Cluster - Minimalist */}
         <div className="flex items-center gap-1">
-          <button className="p-1.5 rounded-lg hover:bg-slate-50 transition-colors">
-            <Sun className="w-3.5 h-3.5 text-slate-400" />
+          <button className="p-1 rounded-lg hover:bg-slate-50 transition-colors">
+            <Sun className="w-3 h-3 text-slate-400" />
           </button>
-          <button className="relative p-1.5 rounded-lg hover:bg-slate-50 transition-colors">
-             <Bell className="w-3.5 h-3.5 text-slate-400" />
-             <span className="absolute top-1 right-1 w-2 h-2 bg-[#1AB1A5] rounded-full border border-white" />
+          <button className="relative p-1 rounded-lg hover:bg-slate-50 transition-colors">
+             <Bell className="w-3 h-3 text-slate-400" />
+             <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-[#1AB1A5] rounded-full border border-white" />
           </button>
           
           <div className="flex items-center gap-1 pl-1 ml-1 border-l border-slate-100">
-             <div className="w-6 h-6 rounded-md bg-[#1AB1A5]/10 flex items-center justify-center text-[#1AB1A5]">
-                <User className="w-3.5 h-3.5" />
+             <div className="w-5 h-5 rounded-md bg-[#1AB1A5]/10 flex items-center justify-center text-[#1AB1A5]">
+                <User className="w-3 h-3" />
              </div>
           </div>
 
-          <button className="p-1.5 rounded-lg hover:bg-red-50 transition-colors">
-            <LogOut className="w-3.5 h-3.5 text-red-300" />
+          <button className="p-1 rounded-lg hover:bg-red-50 transition-colors">
+            <LogOut className="w-3 h-3 text-red-300" />
           </button>
         </div>
       </div>

@@ -33,20 +33,20 @@ const InvoicesPage = () => {
           {invoices.map((inv) => {
             const st = statusMap[inv.status as keyof typeof statusMap];
             return (
-              <div key={inv.id} className="bg-white rounded-xl p-3 shadow-sm border border-slate-50 active:scale-[0.99] transition-transform">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#1AB1A5]" />
-                    <span className="font-black text-[11px] text-slate-700">{inv.id}</span>
+              <div key={inv.id} className="bg-white rounded-xl p-2 shadow-sm border border-slate-50 active:scale-[0.99] transition-transform">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <FileText className="w-3 h-3 text-[#1AB1A5]" />
+                    <span className="font-black text-[10px] text-slate-700">{inv.id}</span>
                   </div>
-                  <span className={cn("text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-tighter", st.color)}>{st.label}</span>
+                  <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter", st.color)}>{st.label}</span>
                 </div>
                 <div className="flex justify-between items-end">
                   <div>
-                    <p className="font-black text-xs text-slate-800">{inv.guest}</p>
-                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">{inv.room} • {inv.date}</p>
+                    <p className="font-black text-[11px] text-slate-800 leading-tight">{inv.guest}</p>
+                    <p className="text-[9px] text-slate-400 font-bold mt-0.5 leading-none">{inv.room} • {inv.date}</p>
                   </div>
-                  <p className="text-sm font-black text-[#1AB1A5]">{inv.amount} <span className="text-[9px] opacity-60">VND</span></p>
+                  <p className="text-xs font-black text-[#1AB1A5]">{inv.amount} <span className="text-[8px] opacity-60">VND</span></p>
                 </div>
               </div>
             );

@@ -11,30 +11,29 @@ import { DateRange } from "react-day-picker";
 const StatCard = ({ icon: Icon, value, label, badgeText, badgeColor }: {
   icon: React.ElementType; value: string | number; label: string; badgeText: string; badgeColor: string;
 }) => (
-  <div className="bg-white rounded-xl p-2.5 flex flex-col shadow-sm border border-slate-50">
-    <div className="flex items-center justify-between mb-1.5">
-      <div className={cn("p-1.5 rounded-lg", badgeColor.includes('primary') ? "bg-[#1AB1A5]/10" : "bg-slate-50")}>
-        <Icon className={cn("w-3.5 h-3.5", badgeColor.includes('primary') ? "text-[#1AB1A5]" : "text-slate-400")} />
+  <div className="bg-white rounded-lg p-1.5 flex flex-col shadow-sm border border-slate-50">
+    <div className="flex items-center justify-between mb-0.5">
+      <div className={cn("p-1 rounded-md", badgeColor.includes('primary') ? "bg-[#1AB1A5]/10" : "bg-slate-50")}>
+        <Icon className={cn("w-2.5 h-2.5", badgeColor.includes('primary') ? "text-[#1AB1A5]" : "text-slate-400")} />
       </div>
-      <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-widest", badgeColor)}>{badgeText}</span>
+      <span className={cn("text-[6px] font-black px-1 py-0.5 rounded-full uppercase tracking-tighter", badgeColor)}>{badgeText}</span>
     </div>
-    <span className="text-xl font-black text-slate-800 leading-none">{value}</span>
-    <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-1">{label}</span>
+    <span className="text-base font-black text-slate-800 leading-none">{value}</span>
+    <span className="text-[6px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">{label}</span>
   </div>
 );
 
 const ActivityItem = ({ icon, title, subtitle, code, time, status, statusColor }: {
   icon: string; title: string; subtitle: string; code: string; time: string; status: string; statusColor: string;
 }) => (
-  <div className="flex items-start gap-3 py-3 border-b border-border last:border-0">
-    <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-lg shrink-0">{icon}</div>
+  <div className="flex items-start gap-2 py-1.5 border-b border-border last:border-0">
+    <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-base shrink-0">{icon}</div>
     <div className="flex-1 min-w-0">
-      <p className="font-semibold text-sm">{title}</p>
-      <p className="text-xs text-muted-foreground">{subtitle}</p>
-      <p className="text-xs text-muted-foreground">{code}</p>
-      <p className="text-[10px] text-muted-foreground mt-0.5">{time}</p>
+      <p className="font-bold text-[10px] leading-tight text-slate-800">{title}</p>
+      <p className="text-[9px] text-muted-foreground leading-tight">{subtitle}</p>
+      <p className="text-[8px] text-muted-foreground leading-tight mt-0.5 italic">{code}</p>
     </div>
-    <span className={`text-[10px] font-bold px-2 py-1 rounded-md shrink-0 ${statusColor}`}>{status}</span>
+    <span className={`text-[8px] font-black px-1.5 py-0.5 rounded h-fit ${statusColor}`}>{status}</span>
   </div>
 );
 
@@ -91,7 +90,7 @@ const OverviewPage = () => {
           )}
         >
           <CalendarIcon className="mr-2 h-3 w-3" />
-          {date ? format(date, "dd MMMM, y") : <span>Chọn ngày</span>}
+          {date ? format(date, "dd/MM/yyyy") : <span>Chọn ngày</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
@@ -120,10 +119,10 @@ const OverviewPage = () => {
           {range?.from ? (
             range.to ? (
               <>
-                {format(range.from, "dd/MM")} - {format(range.to, "dd/MM/y")}
+                {format(range.from, "dd/MM/yyyy")} - {format(range.to, "dd/MM/yyyy")}
               </>
             ) : (
-              format(range.from, "dd/MM/y")
+              format(range.from, "dd/MM/yyyy")
             )
           ) : (
             <span>Chọn giai đoạn</span>
@@ -147,15 +146,15 @@ const OverviewPage = () => {
     <div className="min-h-screen bg-[#F8FAFC] animate-in fade-in duration-500 pb-24">
       <AppHeader title="PHS247" icon={LayoutDashboard} variant="white" />
       
-      <div className="px-4 py-2 space-y-3">
+      <div className="px-2 py-1.5 space-y-2">
         {/* Page Title Below Header - Ultra Compact */}
-        <div className="mb-0.5">
-          <h2 className="text-base font-black text-slate-800 tracking-tighter">Tổng quan hôm nay</h2>
-          <p className="text-[7px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">Thứ Hai, 22 tháng 5, 2024</p>
+        <div className="mb-0">
+          <h2 className="text-sm font-black text-slate-800 tracking-tighter">Tổng quan hôm nay</h2>
+          <p className="text-[6px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Thứ Hai, 22 tháng 5, 2024</p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <StatCard icon={CheckCircle} value={12} label="Phòng sẵn sàng" badgeText="Trống" badgeColor="bg-accent text-accent-foreground" />
           <StatCard icon={Building} value={28} label="Phòng có khách" badgeText="Đang ở" badgeColor="bg-primary/10 text-primary" />
           <StatCard icon={ArrowDownLeft} value="05" label="Lượt check-in" badgeText="Sắp đến" badgeColor="bg-accent text-accent-foreground" />
@@ -222,8 +221,8 @@ const OverviewPage = () => {
 
             return (
               <>
-                <div className="flex justify-center my-6">
-                  <div className="relative w-44 h-44">
+                <div className="flex justify-center my-2">
+                  <div className="relative w-28 h-28">
                     <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
                       <circle cx="60" cy="60" r="50" fill="none" stroke="hsl(var(--border))" strokeWidth="8" />
                       {data.map((item, index) => {
@@ -257,17 +256,17 @@ const OverviewPage = () => {
                     >
                       {activeSegment ? (
                         <>
-                          <span className="text-2xl font-extrabold">{activeSegment.value.toLocaleString()}</span>
-                          <span className="text-[10px] text-muted-foreground uppercase font-medium">{activeSegment.label}</span>
+                          <span className="text-lg font-extrabold">{activeSegment.value.toLocaleString()}</span>
+                          <span className="text-[7px] text-muted-foreground uppercase font-medium">{activeSegment.label}</span>
                         </>
                       ) : (
                         <>
-                          <span className="text-3xl font-bold">{occupancyPercentage}%</span>
+                          <span className="text-xl font-bold">{occupancyPercentage}%</span>
                           <span className={cn(
-                            "text-xs flex items-center gap-0.5 font-bold mt-0.5",
+                            "text-[8px] flex items-center gap-0.5 font-bold mt-0.5",
                             Number(growth) >= 0 ? "text-emerald-700" : "text-destructive"
                           )}>
-                            <TrendingUp className="w-3 h-3" /> {Number(growth) >= 0 ? "+" : ""}{growth}%
+                            <TrendingUp className="w-2 h-2" /> {Number(growth) >= 0 ? "+" : ""}{growth}%
                           </span>
                         </>
                       )}

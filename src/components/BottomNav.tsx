@@ -1,4 +1,4 @@
-import { LayoutGrid, Users, Grid3X3, CalendarDays, FileText } from "lucide-react";
+import { LayoutGrid, Users, Grid3X3, CalendarDays, BarChart3 } from "lucide-react";
 
 interface BottomNavProps {
   activeTab: string;
@@ -10,7 +10,7 @@ const tabs = [
   { id: "customers", label: "Khách hàng", icon: Users },
   { id: "rooms", label: "Sơ đồ phòng", icon: Grid3X3 },
   { id: "planning", label: "Kế hoạch", icon: CalendarDays },
-  { id: "invoices", label: "Hóa đơn", icon: FileText },
+  { id: "reports", label: "Báo cáo", icon: BarChart3 },
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {

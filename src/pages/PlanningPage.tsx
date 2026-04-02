@@ -1,164 +1,530 @@
-import { useState } from "react";
-import { ChevronDown, Building, BarChart3, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
-import AppHeader from "@/components/AppHeader";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
+import { 
+  ChevronDown, Building, BarChart3, ChevronLeft, ChevronRight, 
+  Calendar, Search, Plus, ListFilter, HelpCircle, CheckCircle2
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { 
+  format, 
+  addDays, 
+  isWeekend, 
+  isToday as isDateToday,
+  differenceInDays,
+  eachDayOfInterval,
+  isSameDay,
+  startOfDay
+} from "date-fns";
+import { vi } from "date-fns/locale";
+import { toast } from "sonner";
+import AppHeader from "@/components/AppHeader";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as UICalendar } from "@/components/ui/calendar";
 
 interface Booking {
   id: string;
   guest: string;
   roomType: string;
-  startDay: number;
-  endDay: number;
+  startDate: Date;
+  endDate: Date;
   color: string;
   roomNumber: string;
+  price?: number;
+  note?: string;
 }
 
 const initialRooms = [
-  { number: "101", type: "STD" },
-  { number: "102", type: "DLX" },
-  { number: "201", type: "SUI" },
+  { number: "101", type: "Đơn cơ bản" },
+  { number: "102", type: "Đơn Cao Cấp" },
+  { number: "111", type: "Luxury" },
+  { number: "201", type: "Đơn cơ bản" },
   { number: "202", type: "VIP" },
-  { number: "301", type: "DLX" },
-  { number: "302", type: "STD" },
-  { number: "401", type: "STD" },
+  { number: "301", type: "Deluxe" },
+  { number: "302", type: "Standard" },
+  { number: "401", type: "Standard" },
 ];
+
+const referenceDate = startOfDay(new Date(2026, 3, 2)); // Today is April 2, 2026
 
 const initialBookings: Booking[] = [
-  { id: "1", guest: "Nguyễn Văn An", roomType: "Standard", startDay: 24, endDay: 25, color: "bg-primary", roomNumber: "101" },
-  { id: "2", guest: "Trần Thị Bình", roomType: "Deluxe", startDay: 24, endDay: 26, color: "bg-primary", roomNumber: "102" },
-  { id: "3", guest: "Lê Hoàng Cường", roomType: "Suite", startDay: 25, endDay: 27, color: "bg-primary", roomNumber: "201" },
-  { id: "4", guest: "John Smith", roomType: "VIP", startDay: 24, endDay: 27, color: "bg-orange-500", roomNumber: "202" },
+  { id: "1", guest: "Bảo Việt", roomType: "Đơn cơ bản", startDate: new Date(2026, 2, 31), endDate: new Date(2026, 3, 3), color: "bg-[#1AB1A5]", roomNumber: "101", price: 1300000, note: "Khách quen" },
+  { id: "2", guest: "AB", roomType: "Đơn cơ bản", startDate: new Date(2026, 3, 4), endDate: new Date(2026, 3, 6), color: "bg-[#2196F3]", roomNumber: "101", price: 900000, note: "" },
+  { id: "3", guest: "Testing", roomType: "Đơn cơ bản", startDate: new Date(2026, 3, 9), endDate: new Date(2026, 3, 11), color: "bg-[#2196F3]", roomNumber: "201", price: 800000, note: "Test booking" },
 ];
 
-const days = [
-  { label: "HÔM NAY", day: 24, weekday: "" },
-  { label: "TH 6", day: 25, weekday: "" },
-  { label: "TH 7", day: 26, weekday: "" },
-  { label: "CN", day: 27, weekday: "", isWeekend: true },
-  { label: "TH 2", day: 28, weekday: "" },
-];
+// ===== Interaction mode type =====
+type InteractionMode = 
+  | null
+  | { type: 'resize'; bookingId: string; side: 'start' | 'end'; originalBooking: Booking }
+  | { type: 'drag'; bookingId: string; originalBooking: Booking };
 
 const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
   const [activeBookings, setActiveBookings] = useState<Booking[]>(initialBookings);
-  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [popoverOpenId, setPopoverOpenId] = useState<string | null>(null);
+  
+  // Single interaction state - much simpler
+  const [interaction, setInteraction] = useState<InteractionMode>(null);
+  const [ghostPreview, setGhostPreview] = useState<{ roomNumber: string; startDate: Date; endDate: Date; isValid: boolean } | null>(null);
+  
+  const gridRef = useRef<HTMLDivElement>(null);
+  const longPressRef = useRef<NodeJS.Timeout | null>(null);
+  const startPosRef = useRef<{ x: number; y: number } | null>(null);
+  const interactionRef = useRef<InteractionMode>(null);
+  const bookingsRef = useRef(activeBookings);
+  const ghostRef = useRef(ghostPreview);
 
-  const onDragStart = (e: React.DragEvent, id: string) => {
-    setDraggedId(id);
-    e.dataTransfer.setData("bookingId", id);
-  };
+  // Keep refs in sync
+  useEffect(() => { interactionRef.current = interaction; }, [interaction]);
+  useEffect(() => { bookingsRef.current = activeBookings; }, [activeBookings]);
+  useEffect(() => { ghostRef.current = ghostPreview; }, [ghostPreview]);
 
-  const onDrop = (e: React.DragEvent, targetRoom: string) => {
-    e.preventDefault();
-    const id = e.dataTransfer.getData("bookingId");
-    setActiveBookings(prev => 
-      prev.map(b => b.id === id ? { ...b, roomNumber: targetRoom } : b)
+  // Date Range
+  const [startDate, setStartDate] = useState<Date>(new Date(2026, 2, 30));
+  const [endDate, setEndDate] = useState<Date>(new Date(2026, 3, 12));
+  
+  const days = useMemo(() => {
+    try {
+      const intervalStart = startOfDay(startDate);
+      const intervalEnd = startOfDay(endDate);
+      const actualEnd = intervalEnd < intervalStart ? addDays(intervalStart, 13) : intervalEnd;
+      
+      return eachDayOfInterval({ start: intervalStart, end: actualEnd }).map(date => {
+        const dayName = format(date, "EEEEEE", { locale: vi }).toUpperCase();
+        return {
+          date,
+          dayName,
+          dateLabel: format(date, "dd/MM"),
+          isWeekend: isWeekend(date),
+          isToday: isSameDay(date, referenceDate)
+        };
+      });
+    } catch (e) {
+      console.error("Invalid date range", e);
+      return [];
+    }
+  }, [startDate, endDate]);
+
+  // ===== Helpers =====
+  const isSlotAvailable = useCallback((id: string, room: string, start: Date, end: Date) => {
+    return !bookingsRef.current.some(b => 
+      b.id !== id && 
+      b.roomNumber === room && 
+      start < b.endDate && end > b.startDate
     );
-    setDraggedId(null);
+  }, []);
+
+  const getDayIndexFromPointer = useCallback((clientX: number): number => {
+    if (!gridRef.current) return -1;
+    const gridRect = gridRef.current.getBoundingClientRect();
+    const scrollLeft = gridRef.current.scrollLeft;
+    const scrollWidth = gridRef.current.scrollWidth;
+    const timelineWidth = scrollWidth - 80;
+    const cellWidth = timelineWidth / days.length;
+    const x = (clientX - gridRect.left) + scrollLeft - 80;
+    return Math.round(x / cellWidth);
+  }, [days.length]);
+
+  const getRoomFromPointer = useCallback((clientX: number, clientY: number): string | null => {
+    const el = document.elementFromPoint(clientX, clientY);
+    const row = el?.closest('[data-room-row]');
+    return row?.getAttribute('data-room-row') || null;
+  }, []);
+
+  // ===== Core pointer handlers (using refs for latest state) =====
+  const onPointerMoveGlobal = useCallback((e: PointerEvent) => {
+    const mode = interactionRef.current;
+    if (!mode) {
+      // Check if we should cancel long press due to movement
+      if (longPressRef.current && startPosRef.current) {
+        const dx = e.clientX - startPosRef.current.x;
+        const dy = e.clientY - startPosRef.current.y;
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+          clearTimeout(longPressRef.current);
+          longPressRef.current = null;
+        }
+      }
+      return;
+    }
+
+    e.preventDefault();
+    const dayIndex = getDayIndexFromPointer(e.clientX);
+    if (dayIndex < 0 || dayIndex >= days.length) return;
+
+    if (mode.type === 'resize') {
+      const orig = mode.originalBooking;
+      let newStart = orig.startDate;
+      let newEnd = orig.endDate;
+      const targetDate = days[dayIndex].date;
+
+      if (mode.side === 'start') {
+        if (targetDate >= orig.endDate) return;
+        newStart = targetDate;
+      } else {
+        const endTarget = addDays(targetDate, 1);
+        if (endTarget <= orig.startDate) return;
+        newEnd = endTarget;
+      }
+
+      const isValid = isSlotAvailable(orig.id, orig.roomNumber, newStart, newEnd);
+      setGhostPreview({ roomNumber: orig.roomNumber, startDate: newStart, endDate: newEnd, isValid });
+    }
+
+    if (mode.type === 'drag') {
+      const orig = mode.originalBooking;
+      const targetRoom = getRoomFromPointer(e.clientX, e.clientY) || orig.roomNumber;
+      const duration = differenceInDays(orig.endDate, orig.startDate);
+      const clampedIndex = Math.max(0, Math.min(dayIndex, days.length - 1));
+      const newStart = days[clampedIndex].date;
+      const newEnd = addDays(newStart, duration);
+      const isValid = isSlotAvailable(orig.id, targetRoom, newStart, newEnd);
+      setGhostPreview({ roomNumber: targetRoom, startDate: newStart, endDate: newEnd, isValid });
+    }
+  }, [days, getDayIndexFromPointer, getRoomFromPointer, isSlotAvailable]);
+
+  const onPointerUpGlobal = useCallback(() => {
+    // Clear long press timer
+    if (longPressRef.current) {
+      clearTimeout(longPressRef.current);
+      longPressRef.current = null;
+    }
+    startPosRef.current = null;
+
+    const mode = interactionRef.current;
+    const ghost = ghostRef.current;
+
+    if (mode && ghost && ghost.isValid) {
+      const bookingId = mode.bookingId;
+      setActiveBookings(prev => prev.map(b => 
+        b.id === bookingId
+          ? { ...b, roomNumber: ghost.roomNumber, startDate: ghost.startDate, endDate: ghost.endDate }
+          : b
+      ));
+      toast.success("Cập nhật thành công!", {
+        icon: <CheckCircle2 className="w-4 h-4 text-white" />,
+        className: "bg-[#1AB1A5] text-white border-0 py-2 px-3 text-[10px]"
+      });
+    }
+
+    setInteraction(null);
+    setGhostPreview(null);
+  }, []);
+
+  // Attach global listeners once
+  useEffect(() => {
+    window.addEventListener('pointermove', onPointerMoveGlobal);
+    window.addEventListener('pointerup', onPointerUpGlobal);
+    window.addEventListener('pointercancel', onPointerUpGlobal);
+    return () => {
+      window.removeEventListener('pointermove', onPointerMoveGlobal);
+      window.removeEventListener('pointerup', onPointerUpGlobal);
+      window.removeEventListener('pointercancel', onPointerUpGlobal);
+    };
+  }, [onPointerMoveGlobal, onPointerUpGlobal]);
+
+  // ===== Start interactions (from booking bars) =====
+  const startResize = (bookingId: string, side: 'start' | 'end', e: React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (popoverOpenId) return;
+    
+    const booking = activeBookings.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    startPosRef.current = { x: e.clientX, y: e.clientY };
+    
+    longPressRef.current = setTimeout(() => {
+      const mode: InteractionMode = { type: 'resize', bookingId, side, originalBooking: { ...booking } };
+      setInteraction(mode);
+      setGhostPreview({ roomNumber: booking.roomNumber, startDate: booking.startDate, endDate: booking.endDate, isValid: true });
+      if (navigator.vibrate) navigator.vibrate(30);
+    }, 300);
   };
+
+  const startDrag = (bookingId: string, e: React.PointerEvent) => {
+    if (popoverOpenId) return;
+
+    const booking = activeBookings.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    startPosRef.current = { x: e.clientX, y: e.clientY };
+
+    longPressRef.current = setTimeout(() => {
+      const mode: InteractionMode = { type: 'drag', bookingId, originalBooking: { ...booking } };
+      setInteraction(mode);
+      setGhostPreview({ roomNumber: booking.roomNumber, startDate: booking.startDate, endDate: booking.endDate, isValid: true });
+      if (navigator.vibrate) navigator.vibrate(30);
+    }, 300);
+  };
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-32 animate-in fade-in duration-500">
+    <div className="min-h-screen bg-[#F0F2F5] pb-32 flex flex-col animate-in fade-in duration-500 overflow-x-hidden">
       <AppHeader title="Kế hoạch phòng" icon={Calendar} variant="white" />
       
-      <div className="px-4 py-2">
-        {/* Ultra-Compact Control */}
-        <div className="flex items-center justify-between mb-2 bg-white p-1.5 rounded-xl border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-1.5">
-            <button className="p-1 px-1.5 hover:bg-slate-50 rounded-md border border-slate-100"><ChevronLeft className="w-3.5 h-3.5 text-slate-400"/></button>
-            <span className="text-[9px] font-black uppercase text-slate-500">T4-TH3</span>
-            <button className="p-1 px-1.5 hover:bg-slate-50 rounded-md border border-slate-100"><ChevronRight className="w-3.5 h-3.5 text-slate-400"/></button>
-          </div>
-          <button className="flex items-center gap-1 bg-[#1AB1A5]/10 text-[#1AB1A5] px-2 py-1 rounded-lg text-[8px] font-black uppercase">
-             Lọc <ChevronDown className="w-2.5 h-2.5" />
-          </button>
-        </div>
+      <div className="flex-1 flex flex-col pt-2">
+        <div className="bg-[#EEE] border-y border-slate-200 p-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">
+           <div className="bg-white rounded border border-slate-300 flex items-center gap-1 shrink-0 px-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="px-2 py-1 text-[11px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-medium">
+                    {format(startDate, "dd/MM/yyyy")}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <UICalendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={(date) => date && setStartDate(date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
 
-        {/* Timeline Table - Ultra-Density */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-4">
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="min-w-[500px]">
-              {/* Header Rows */}
-              <div className="flex bg-slate-50/50 border-b border-slate-100">
-                <div className="w-14 shrink-0 p-2 flex flex-col justify-center border-r border-slate-100">
-                   <p className="text-[7px] font-black text-slate-400 uppercase">Phòng</p>
-                </div>
-                {days.map((d) => (
-                  <div key={d.day} className={cn(
-                    "flex-1 text-center py-2 border-r border-slate-100 last:border-0",
-                    d.day === 24 && "bg-[#1AB1A5]/5"
-                  )}>
-                    <p className={cn("text-[7px] font-black tracking-tighter", d.day === 24 ? "text-[#1AB1A5]" : "text-slate-400")}>{d.label}</p>
-                    <p className={cn("text-xs font-black mt-0.5", d.isWeekend ? "text-red-500" : "text-slate-700")}>{d.day}</p>
-                  </div>
-                ))}
-              </div>
+              <span className="text-slate-400 text-[10px]">→</span>
 
-              {/* Rows - Ultra Dense h-10 */}
-              <div className="divide-y divide-slate-100">
-                {initialRooms.map((room) => {
-                  const bookingList = activeBookings.filter(b => b.roomNumber === room.number);
-                  return (
-                    <div 
-                      key={room.number} 
-                      className="flex h-10 transition-colors hover:bg-slate-50/50"
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => onDrop(e, room.number)}
-                    >
-                      <div className="w-14 shrink-0 p-1 flex flex-col justify-center border-r border-slate-100 bg-slate-50/10">
-                        <p className="font-black text-[10px] text-slate-800">{room.number}</p>
-                        <p className="text-[7px] font-black text-[#1AB1A5] uppercase opacity-60">{room.type}</p>
-                      </div>
-                      <div className="flex-1 relative flex items-center">
-                        {bookingList.map((booking) => (
-                          <div
-                            key={booking.id}
-                            draggable
-                            onDragStart={(e) => onDragStart(e, booking.id)}
-                            className={cn(
-                              booking.color,
-                              "text-white rounded-md px-1 py-0.5 absolute shadow-sm cursor-move select-none transition-transform active:scale-95 z-10 border border-white/20 h-6 flex flex-col justify-center",
-                              draggedId === booking.id && "opacity-50 scale-105"
-                            )}
-                            style={{
-                              left: `${((booking.startDay - 24) / 5) * 100}%`,
-                              width: `${((booking.endDay - booking.startDay + 1) / 5) * 100}%`,
-                              margin: '0 1px'
-                            }}
-                          >
-                            <p className="text-[8px] font-black truncate leading-tight">{booking.guest}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Legend / Metrics - Ultra Compact */}
-        <div className="grid grid-cols-2 gap-2 mt-2">
-           <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-2.5 flex flex-col gap-0.5">
-              <div className="flex items-center gap-1.5 text-emerald-800">
-                 <Building className="w-3 h-3" />
-                 <span className="text-[8px] font-black uppercase">Trống</span>
-              </div>
-              <p className="text-xl font-black text-emerald-600">12</p>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="px-2 py-1 text-[11px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-medium">
+                    {format(endDate, "dd/MM/yyyy")}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <UICalendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={(date) => date && setEndDate(date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <Calendar className="w-3 h-3 text-[#1AB1A5] mr-1" />
            </div>
-           <div className="bg-sky-50 border border-sky-100 rounded-xl p-2.5 flex flex-col gap-0.5">
-              <div className="flex items-center gap-1.5 text-sky-800">
-                 <BarChart3 className="w-3 h-3" />
-                 <span className="text-[8px] font-black uppercase">C.Suất</span>
+           
+           <button className="bg-white border border-slate-300 px-4 py-1 rounded text-[11px] font-bold text-slate-700 hover:bg-slate-50 transition-colors shrink-0">Xem</button>
+           
+           <div className="flex bg-white rounded border border-slate-300 overflow-hidden shrink-0">
+              <button className="px-3 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-50 border-r border-slate-200">Ngày</button>
+              <button className="px-3 py-1 text-[11px] font-bold bg-[#1AB1A5] text-white">Tháng</button>
+           </div>
+
+           <div className="flex gap-1.5 ml-1 shrink-0">
+              <button className="bg-white border border-slate-300 px-2 py-1 rounded text-[11px] font-bold text-slate-700 flex items-center gap-1">Loại <ChevronDown className="w-3 h-3 text-slate-400" /></button>
+              <button className="bg-white border border-slate-300 px-2 py-1 rounded text-[11px] font-bold text-slate-700 flex items-center gap-1">Tầng <ChevronDown className="w-3 h-3 text-slate-400" /></button>
+              <button className="bg-[#1AB1A5] border border-[#148e85] px-2 py-1 rounded text-[11px] font-bold text-white flex items-center gap-1 shadow-sm">Phòng <ChevronDown className="w-3 h-3 text-white/70" /></button>
+           </div>
+
+           <HelpCircle className="w-5 h-5 text-[#1AB1A5] ml-auto cursor-pointer shrink-0" />
+        </div>
+
+        {/* Current Month Active Indicator */}
+        <div className="flex items-center justify-between py-2 px-4 bg-white border-b border-slate-100">
+           <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-normal">
+              {format(startDate, "MMMM", { locale: vi })} {format(startDate, "yyyy")}
+           </h3>
+           <div className="flex items-center gap-1">
+              <button className="p-1 hover:bg-slate-100 rounded-md"><ChevronLeft className="w-4 h-4 text-slate-400"/></button>
+              <button className="p-1 hover:bg-slate-100 rounded-md"><ChevronRight className="w-4 h-4 text-slate-400"/></button>
+           </div>
+        </div>
+
+        {/* Timeline Grid Content */}
+        <div ref={gridRef} className="flex-1 bg-white overflow-x-auto scrollbar-hide relative group">
+           <div className="min-w-[700px] flex flex-col h-full">
+              {/* Table Header */}
+              <div className="flex sticky top-0 z-30">
+                 <div className="w-20 shrink-0 bg-[#F9F9F9] border-r border-b border-slate-200" />
+                 {days.map((d) => (
+                   <div key={d.date.toISOString()} className={cn(
+                     "flex-1 flex flex-col items-center justify-center py-0.5 border-r border-b border-slate-200 text-[8px] font-black leading-none",
+                     d.isWeekend && !d.isToday && "bg-[#FFEBCC] text-slate-700",
+                     d.isToday && "bg-[#FF9800] text-white",
+                     !d.isWeekend && !d.isToday && "bg-[#EEE] text-slate-600"
+                   )}>
+                     <span>{d.dayName}</span>
+                     <span>{d.dateLabel}</span>
+                   </div>
+                 ))}
               </div>
-              <p className="text-xl font-black text-[#1AB1A5]">84%</p>
+
+              {/* Room Rows */}
+              <div className="flex-1 divide-y divide-slate-100 min-h-[60vh]">
+                 {initialRooms.map((room) => {
+                   const bookingList = activeBookings.filter(b => b.roomNumber === room.number);
+                   return (
+                     <div key={room.number} className="flex h-8 bg-white" data-room-row={room.number}>
+                        <div className="w-20 shrink-0 flex items-center px-1 border-r border-slate-200 bg-[#F9F9F9] sticky left-0 z-20" data-room-row={room.number}>
+                           <span className="text-[9px] font-black text-slate-800 w-6 tracking-normal">{room.number}</span>
+                           <span className="text-[7px] text-slate-500 truncate leading-none uppercase font-bold tracking-normal">{room.type}</span>
+                        </div>
+                        <div className="flex-1 flex relative">
+                           {days.map((d) => (
+                             <div 
+                               key={d.date.toISOString()} 
+                               className="flex-1 border-r border-slate-50 h-full hover:bg-slate-50 transition-colors"
+                             />
+                           ))}
+
+                           {/* Ghost Preview */}
+                           {ghostPreview && ghostPreview.roomNumber === room.number && (
+                             <div 
+                               className={cn(
+                                 "absolute h-5 top-1.5 rounded-sm border-2 border-dashed z-50 pointer-events-none flex items-center px-1 overflow-hidden",
+                                 ghostPreview.isValid 
+                                   ? "bg-emerald-400/25 border-emerald-500" 
+                                   : "bg-rose-500/25 border-rose-500"
+                               )}
+                               style={{
+                                 left: `calc(${(differenceInDays(ghostPreview.startDate, startDate) / days.length) * 100}% + 1px)`,
+                                 width: `calc(${(differenceInDays(ghostPreview.endDate, ghostPreview.startDate) / days.length) * 100}% - 2px)`
+                               }}
+                             >
+                                <span className={cn(
+                                  "text-[6px] font-black uppercase whitespace-nowrap",
+                                  ghostPreview.isValid ? "text-emerald-700" : "text-rose-600"
+                                )}>
+                                  {ghostPreview.isValid 
+                                    ? differenceInDays(ghostPreview.endDate, ghostPreview.startDate) + " ngày"
+                                    : "Đã có khách"}
+                                </span>
+                             </div>
+                           )}
+                           
+                           {/* Booking Bars */}
+                           {bookingList.map((booking) => {
+                             const startDiff = differenceInDays(booking.startDate, startDate);
+                             const duration = differenceInDays(booking.endDate, booking.startDate);
+                             
+                             if (startDiff + duration < 0 || startDiff >= days.length) return null;
+                             
+                             const leftPercent = (startDiff / days.length) * 100;
+                             const widthPercent = (duration / days.length) * 100;
+                             const isActive = interaction?.bookingId === booking.id;
+
+                             return (
+                               <Popover 
+                                 key={booking.id} 
+                                 open={popoverOpenId === booking.id && !interaction} 
+                                 onOpenChange={(open) => {
+                                   if (!interaction) {
+                                     setPopoverOpenId(open ? booking.id : null);
+                                   }
+                                 }}
+                               >
+                                 <PopoverTrigger asChild>
+                                   <div
+                                     onPointerDown={(e) => startDrag(booking.id, e)}
+                                     className={cn(
+                                       booking.color,
+                                       "absolute h-5 top-1.5 rounded-sm shadow-sm border border-white/20 px-1 cursor-pointer z-10 flex items-center group/bar select-none",
+                                       isActive && "ring-2 ring-white/60 shadow-lg z-30",
+                                     )}
+                                     style={{
+                                       left: `calc(${leftPercent}% + 1px)`,
+                                       width: `calc(${widthPercent}% - 2px)`,
+                                       touchAction: 'none'
+                                     }}
+                                   >
+                                      {/* Left Resize Handle */}
+                                      <div 
+                                        className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize z-20 flex items-center justify-start"
+                                        onPointerDown={(e) => startResize(booking.id, 'start', e)}
+                                      >
+                                        <div className="w-1 h-3 bg-white/50 rounded-full ml-0.5" />
+                                      </div>
+                                      
+                                      <span className="text-[7px] font-black text-white truncate drop-shadow-sm tracking-normal flex-1 text-center pointer-events-none">
+                                        {booking.guest}
+                                      </span>
+
+                                      {/* Right Resize Handle */}
+                                      <div 
+                                        className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize z-20 flex items-center justify-end"
+                                        onPointerDown={(e) => startResize(booking.id, 'end', e)}
+                                      >
+                                        <div className="w-1 h-3 bg-white/50 rounded-full mr-0.5" />
+                                      </div>
+                                   </div>
+                                 </PopoverTrigger>
+                                 <PopoverContent className="w-56 p-0 overflow-hidden border-slate-200 shadow-xl rounded-lg" align="start">
+                                    <div className="bg-white text-[10px]">
+                                       <div className="bg-slate-50 px-3 py-2 border-b border-slate-100 flex justify-between items-center">
+                                          <span className="font-black text-slate-400 uppercase tracking-widest text-[8px]">Chi tiết đặt phòng</span>
+                                          <span className="font-bold text-[#1AB1A5]">#{booking.id}</span>
+                                       </div>
+                                       <div className="p-3 space-y-2">
+                                          <div className="flex justify-between">
+                                             <span className="text-slate-400">Khách hàng:</span>
+                                             <span className="font-bold text-slate-800">{booking.guest}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                             <span className="text-slate-400">Phòng:</span>
+                                             <span className="font-bold text-slate-800">{booking.roomNumber} - {booking.roomType}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                             <span className="text-slate-400">Ngày đến:</span>
+                                             <span className="font-bold text-slate-800">{format(booking.startDate, "dd/MM/yyyy")}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                             <span className="text-slate-400">Ngày đi:</span>
+                                             <span className="font-bold text-slate-800">{format(booking.endDate, "dd/MM/yyyy")}</span>
+                                          </div>
+                                          <div className="flex justify-between border-t border-slate-50 pt-2">
+                                             <span className="text-slate-400">Giá phòng:</span>
+                                             <span className="font-black text-[#1AB1A5]">{booking.price?.toLocaleString()} VND</span>
+                                          </div>
+                                          {booking.note && (
+                                             <div className="bg-slate-50 p-2 rounded text-[9px] text-slate-500 italic mt-2 border-l-2 border-slate-200">
+                                                "{booking.note}"
+                                             </div>
+                                          )}
+                                       </div>
+                                       <div className="grid grid-cols-2 border-t border-slate-100">
+                                          <button className="py-2 text-slate-500 hover:bg-slate-50 font-bold border-r border-slate-100 transition-colors">Sửa</button>
+                                          <button className="py-2 text-rose-500 hover:bg-rose-50 font-bold transition-colors">Hủy</button>
+                                       </div>
+                                    </div>
+                                 </PopoverContent>
+                               </Popover>
+                             );
+                           })}
+                        </div>
+                     </div>
+                   );
+                 })}
+              </div>
+
+              {/* Sticky Summary Footer */}
+              <div className="sticky bottom-0 left-0 right-0 bg-[#F9F9F9] border-t border-slate-300 z-40 shadow-[0_-2px_6px_rgba(0,0,0,0.05)]">
+                 <div className="flex">
+                    <div className="w-20 shrink-0 bg-[#1AB1A5] text-white p-0.5 flex flex-col justify-center sticky left-0 z-50 overflow-hidden">
+                       <span className="text-[7px] font-black uppercase leading-none tracking-normal">P. Đang đặt</span>
+                    </div>
+                    {days.map((d, i) => (
+                      <div key={i} className="flex-1 border-r border-slate-200 p-0.5 flex justify-center items-center text-[8px] font-bold text-slate-700">
+                         {i % 4 === 1 ? "25%" : i % 4 === 2 ? "25%" : i % 4 === 3 ? "25%" : "0%"}
+                      </div>
+                    ))}
+                 </div>
+                 <div className="flex">
+                    <div className="w-20 shrink-0 bg-[#1AB1A5] text-white p-0.5 flex flex-col justify-center border-t border-white/10 sticky left-0 z-50 overflow-hidden">
+                       <span className="text-[7px] font-black uppercase leading-none tracking-normal">P. Trống</span>
+                    </div>
+                    {days.map((d, i) => (
+                      <div key={i} className="flex-1 border-r border-slate-200 p-0.5 flex justify-center items-center text-[8px] font-black text-slate-800">
+                         {i % 4 === 1 ? "3" : i % 4 === 2 ? "3" : i % 4 === 3 ? "3" : "4"}
+                      </div>
+                    ))}
+                 </div>
+              </div>
            </div>
         </div>
       </div>
 
-      {/* Circle FAB Button - Synchronized */}
       <button 
         onClick={() => onNavigate("registration")}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-[#1AB1A5] text-white rounded-full shadow-[0_12px_40px_rgba(26,177,165,0.4)] flex items-center justify-center text-3xl font-light z-[80] hover:scale-110 active:scale-95 transition-all"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-[#1AB1A5] text-white rounded-full shadow-[0_12px_40px_rgba(26,177,165,0.4)] flex items-center justify-center text-3xl font-light z-[100] hover:scale-110 active:scale-95 transition-all border-4 border-white"
       >
         <span>+</span>
       </button>

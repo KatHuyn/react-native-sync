@@ -44,7 +44,7 @@ const customers: CustomerData[] = [
     room: "101", 
     roomType: "Double Deluxe",
     gender: "Nam", 
-    dob: "1990-05-12",
+    dob: "12/05/1990",
     idType: "CCCD", 
     idNumber: "001234567890", 
     nationality: "Việt Nam", 
@@ -56,8 +56,8 @@ const customers: CustomerData[] = [
     totalRoomRevenue: "11.4M",
     totalServiceRevenue: "2.4M",
     history: [
-      { id: "B1", room: "101", roomType: "Double Deluxe", checkIn: "2026-03-30", checkOut: "2026-04-02", price: "5.400.000đ", status: "active" },
-      { id: "B7", room: "401", roomType: "Executive Suite", checkIn: "2026-03-27", checkOut: "2026-03-30", price: "6.000.000đ", status: "completed" },
+      { id: "B1", room: "101", roomType: "Double Deluxe", checkIn: "30/03/2026", checkOut: "02/04/2026", price: "5.400.000đ", status: "active" },
+      { id: "B7", room: "401", roomType: "Executive Suite", checkIn: "27/03/2026", checkOut: "30/03/2026", price: "6.000.000đ", status: "completed" },
     ]
   },
   { 
@@ -66,7 +66,7 @@ const customers: CustomerData[] = [
     room: "102", 
     roomType: "Deluxe",
     gender: "Nữ", 
-    dob: "1992-08-20",
+    dob: "20/08/1992",
     idType: "CCCD", 
     idNumber: "001092003841", 
     nationality: "Việt Nam", 
@@ -78,7 +78,7 @@ const customers: CustomerData[] = [
     totalRoomRevenue: "5.4M",
     totalServiceRevenue: "0.8M",
     history: [
-      { id: "B2", room: "102", roomType: "Deluxe", checkIn: "2026-03-31", checkOut: "2026-04-03", price: "5.400.000đ", status: "active" },
+      { id: "B2", room: "102", roomType: "Deluxe", checkIn: "31/03/2026", checkOut: "03/04/2026", price: "5.400.000đ", status: "active" },
     ]
   },
   { 
@@ -87,7 +87,7 @@ const customers: CustomerData[] = [
     room: "103", 
     roomType: "Suite",
     gender: "Nam", 
-    dob: "1985-01-15",
+    dob: "15/01/1985",
     idType: "Passport", 
     idNumber: "B1234567", 
     nationality: "Việt Nam", 
@@ -99,8 +99,8 @@ const customers: CustomerData[] = [
     totalRoomRevenue: "24.0M",
     totalServiceRevenue: "4.5M",
     history: [
-      { id: "B3", room: "103", roomType: "Suite", checkIn: "2026-04-01", checkOut: "2026-04-04", price: "9.000.000đ", status: "active" },
-      { id: "B5", room: "103", roomType: "Suite", checkIn: "2026-03-15", checkOut: "2026-03-20", price: "15.000.000đ", status: "completed" },
+      { id: "B3", room: "103", roomType: "Suite", checkIn: "01/04/2026", checkOut: "04/04/2026", price: "9.000.000đ", status: "active" },
+      { id: "B5", room: "103", roomType: "Suite", checkIn: "15/03/2026", checkOut: "20/03/2026", price: "15.000.000đ", status: "completed" },
     ]
   },
   { 
@@ -109,7 +109,7 @@ const customers: CustomerData[] = [
     room: "201", 
     roomType: "VIP",
     gender: "Nam", 
-    dob: "1988-11-30",
+    dob: "30/11/1988",
     idType: "CCCD", 
     idNumber: "0234567890", 
     nationality: "Việt Nam", 
@@ -121,7 +121,7 @@ const customers: CustomerData[] = [
     totalRoomRevenue: "15.0M",
     totalServiceRevenue: "1.2M",
     history: [
-      { id: "B4", room: "201", roomType: "VIP", checkIn: "2026-03-29", checkOut: "2026-04-01", price: "15.000.000đ", status: "active" },
+      { id: "B4", room: "201", roomType: "VIP", checkIn: "29/03/2026", checkOut: "01/04/2026", price: "15.000.000đ", status: "active" },
     ]
   },
   { 
@@ -130,7 +130,7 @@ const customers: CustomerData[] = [
     room: "202", 
     roomType: "Standard",
     gender: "Nam", 
-    dob: "1975-05-05",
+    dob: "05/05/1975",
     idType: "Passport", 
     idNumber: "G12345678", 
     nationality: "USA", 
@@ -142,8 +142,198 @@ const customers: CustomerData[] = [
     totalRoomRevenue: "2.4M",
     totalServiceRevenue: "0.2M",
     history: [
-      { id: "B6", room: "202", roomType: "Standard", checkIn: "2026-04-05", checkOut: "2026-04-07", price: "2.400.000đ", status: "completed" },
+      { id: "B6", room: "202", roomType: "Standard", checkIn: "05/04/2026", checkOut: "07/04/2026", price: "2.400.000đ", status: "completed" },
     ]
+  },
+  { 
+    id: "C006", 
+    name: "Võ Văn Kiệt", 
+    room: "301", 
+    roomType: "Standard",
+    gender: "Nam", 
+    dob: "01/01/1980",
+    idType: "CCCD", 
+    idNumber: "079123456789", 
+    nationality: "Việt Nam", 
+    phone: "0988777666", 
+    email: "kiet.vv@gmail.com", 
+    address: "Quận 3, TP.HCM",
+    status: "staying",
+    bookingCount: 5,
+    totalRoomRevenue: "45.0M",
+    totalServiceRevenue: "8.2M",
+    history: []
+  },
+  { 
+    id: "C007", 
+    name: "Lê Thị Hồng", 
+    room: "302", 
+    roomType: "Deluxe",
+    gender: "Nữ", 
+    dob: "14/02/1995",
+    idType: "CCCD", 
+    idNumber: "080195002233", 
+    nationality: "Việt Nam", 
+    phone: "0911222333", 
+    email: "hong.lt@gmail.com", 
+    address: "Đà Nẵng",
+    status: "staying",
+    bookingCount: 2,
+    totalRoomRevenue: "12.0M",
+    totalServiceRevenue: "1.5M",
+    history: []
+  },
+  { 
+    id: "C008", 
+    name: "Phan Anh Tuấn", 
+    room: "401", 
+    roomType: "Suite",
+    gender: "Nam", 
+    dob: "10/10/1982",
+    idType: "CCCD", 
+    idNumber: "001082004455", 
+    nationality: "Việt Nam", 
+    phone: "0909090909", 
+    email: "tuan.pa@gmail.com", 
+    address: "Hà Nội",
+    status: "checkout",
+    bookingCount: 8,
+    totalRoomRevenue: "120.0M",
+    totalServiceRevenue: "25.0M",
+    history: []
+  },
+  { 
+    id: "C009", 
+    name: "Đặng Thu Thảo", 
+    room: "402", 
+    roomType: "Standard",
+    gender: "Nữ", 
+    dob: "25/12/1996",
+    idType: "CCCD", 
+    idNumber: "072196007788", 
+    nationality: "Việt Nam", 
+    phone: "0333444555", 
+    email: "thao.dt@gmail.com", 
+    address: "Cần Thơ",
+    status: "reserved",
+    bookingCount: 1,
+    totalRoomRevenue: "3.5M",
+    totalServiceRevenue: "0.5M",
+    history: []
+  },
+  { 
+    id: "C010", 
+    name: "Trương Mỹ Linh", 
+    room: "501", 
+    roomType: "VIP",
+    gender: "Nữ", 
+    dob: "08/03/1991",
+    idType: "CCCD", 
+    idNumber: "001091001122", 
+    nationality: "Việt Nam", 
+    phone: "0944555666", 
+    email: "linh.tm@gmail.com", 
+    address: "Quận 7, TP.HCM",
+    status: "staying",
+    bookingCount: 4,
+    totalRoomRevenue: "60.0M",
+    totalServiceRevenue: "12.0M",
+    history: []
+  },
+  { 
+    id: "C011", 
+    name: "Bùi Tiến Dũng", 
+    room: "203", 
+    roomType: "Standard",
+    gender: "Nam", 
+    dob: "20/10/1997",
+    idType: "CCCD", 
+    idNumber: "034197005566", 
+    nationality: "Việt Nam", 
+    phone: "0966777888", 
+    email: "dung.bt@gmail.com", 
+    address: "Thanh Hóa",
+    status: "checkout",
+    bookingCount: 1,
+    totalRoomRevenue: "2.1M",
+    totalServiceRevenue: "0.2M",
+    history: []
+  },
+  { 
+    id: "C012", 
+    name: "Michael Chang", 
+    room: "105", 
+    roomType: "Luxury",
+    gender: "Nam", 
+    dob: "15/07/1988",
+    idType: "Passport", 
+    idNumber: "HK998877", 
+    nationality: "Hong Kong", 
+    phone: "0901223344", 
+    email: "m.chang@yahoo.com", 
+    address: "Tsim Sha Tsui, HK",
+    status: "staying",
+    bookingCount: 2,
+    totalRoomRevenue: "28.5M",
+    totalServiceRevenue: "5.4M",
+    history: []
+  },
+  { 
+    id: "C013", 
+    name: "Lê Quang Đại", 
+    room: "204", 
+    roomType: "Double",
+    gender: "Nam", 
+    dob: "22/11/1985",
+    idType: "CCCD", 
+    idNumber: "001085002233", 
+    nationality: "Việt Nam", 
+    phone: "0988777111", 
+    email: "dai.lq@gmail.com", 
+    address: "Hải Phòng",
+    status: "staying",
+    bookingCount: 1,
+    totalRoomRevenue: "4.2M",
+    totalServiceRevenue: "0.8M",
+    history: []
+  },
+  { 
+    id: "C014", 
+    name: "Phạm Thúy Hạnh", 
+    room: "305", 
+    roomType: "VIP",
+    gender: "Nữ", 
+    dob: "12/01/1993",
+    idType: "CCCD", 
+    idNumber: "001093006677", 
+    nationality: "Việt Nam", 
+    phone: "0977888999", 
+    email: "hanh.pt@gmail.com", 
+    address: "Bắc Ninh",
+    status: "staying",
+    bookingCount: 3,
+    totalRoomRevenue: "35.0M",
+    totalServiceRevenue: "4.2M",
+    history: []
+  },
+  { 
+    id: "C015", 
+    name: "Nguyễn Minh Khôi", 
+    room: "206", 
+    roomType: "Suite",
+    gender: "Nam", 
+    dob: "05/09/1987",
+    idType: "CCCD", 
+    idNumber: "001087009988", 
+    nationality: "Việt Nam", 
+    phone: "0908889990", 
+    email: "khoi.nm@gmail.com", 
+    address: "Hải Dương",
+    status: "staying",
+    bookingCount: 2,
+    totalRoomRevenue: "18.5M",
+    totalServiceRevenue: "3.2M",
+    history: []
   },
 ];
 
@@ -164,7 +354,7 @@ const CustomerDetailView = ({ customer, onBack }: { customer: CustomerData; onBa
           </div>
         </div>
         <div className="w-10 h-10 rounded-full border-2 border-white/50 overflow-hidden shadow-md">
-          <img src="https://i.pravatar.cc/150?u=an" alt="avatar" className="w-full h-full object-cover" />
+          <img src={`https://i.pravatar.cc/150?u=${customer.id}`} alt="avatar" className="w-full h-full object-cover" />
         </div>
       </div>
 
@@ -266,57 +456,65 @@ const CustomersPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
       
       <div className="max-w-md mx-auto min-h-screen flex flex-col">
         {/* Ultra-Compact Search Section */}
-        <div className="px-4 py-2 flex gap-1.5">
+        <div className="px-2 py-1 flex gap-1">
           <div className="relative flex-1 group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-[#1AB1A5] transition-colors" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-2.5 h-2.5 text-slate-400 group-focus-within:text-[#1AB1A5] transition-colors" />
             <input 
               type="text"
               placeholder="Tìm kiếm..."
-              className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-[11px] text-slate-800 placeholder:text-slate-400 focus:ring-1 focus:ring-[#1AB1A5] outline-none font-medium shadow-sm"
+              className="w-full bg-white border border-slate-100 rounded-md pl-6 pr-1.5 py-0.5 text-[9px] text-slate-800 placeholder:text-slate-400 focus:outline-none font-medium shadow-sm"
             />
           </div>
-          <button className="p-1.5 bg-white border border-slate-200 rounded-lg text-slate-400 hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
-            <SlidersHorizontal className="w-3.5 h-3.5" />
+          <button className="p-1 bg-white border border-slate-100 rounded-md text-slate-400 hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
+            <SlidersHorizontal className="w-2.5 h-2.5" />
           </button>
         </div>
 
         {/* Ultra High-Density 2-Column Grid */}
-        <div className="flex-1 px-4 grid grid-cols-2 gap-2 pb-32">
+        <div className="flex-1 px-2 grid grid-cols-2 gap-1.5 pb-32">
           {customers.map((c, i) => (
-            <div key={i} className="bg-white rounded-xl p-2.5 shadow-sm border border-slate-100 relative group active:scale-[0.99] transition-transform flex flex-col justify-between">
-              <div className="flex items-start justify-between mb-2">
+            <div key={i} className="bg-white rounded-lg p-2 shadow-sm border border-slate-100 relative group active:scale-[0.99] transition-transform flex flex-col justify-between min-h-[90px]">
+              <div className="flex items-start justify-between mb-1.5">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
-                     <UserIcon className="w-4 h-4" />
+                  <div className="w-5 h-5 bg-slate-50 rounded flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
+                     <UserIcon className="w-2.5 h-2.5" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-[10px] font-black text-slate-800 truncate leading-none">{c.name}</h3>
-                    <div className="flex gap-0.5 mt-1">
-                      <span className="text-[7px] font-black bg-[#1AB1A5]/10 text-[#1AB1A5] px-1 py-0.5 rounded uppercase">P.{c.room}</span>
-                      <span className="text-[7px] font-black bg-slate-100 text-slate-500 px-1 py-0.5 rounded uppercase">{c.gender}</span>
+                    <h3 className="text-[8px] font-black text-slate-800 truncate leading-none mb-0.5">{c.name}</h3>
+                    <div className="flex gap-1 mt-0.5">
+                      <span className="text-[5.5px] font-black bg-[#1AB1A5]/10 text-[#1AB1A5] px-1 py-0.5 rounded uppercase leading-none">P.{c.room}</span>
+                      <span className="text-[5.5px] font-black bg-slate-100 text-slate-500 px-1 py-0.5 rounded uppercase leading-none">{c.gender}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-1 mb-2.5">
+              <div className="space-y-1 mb-2">
                 <div className="flex flex-col">
-                  <span className="text-[7px] font-bold text-slate-400 uppercase tracking-tighter">ID: {c.idNumber}</span>
+                  <span className="text-[5.5px] font-bold text-slate-400 uppercase tracking-tighter leading-none whitespace-nowrap overflow-hidden mb-0.5">ID: {c.idNumber}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-[#1AB1A5]" />
-                  <span className="text-[8px] font-bold text-[#1AB1A5] uppercase">Đang ở</span>
+                  <span className={cn(
+                    "w-1 h-1 rounded-full",
+                    c.status === "staying" ? "bg-[#1AB1A5]" : "bg-amber-400"
+                  )} />
+                  <span className={cn(
+                    "text-[6px] font-black uppercase leading-none",
+                    c.status === "staying" ? "text-[#1AB1A5]" : "text-amber-500"
+                  )}>
+                    {c.status === "staying" ? "Đang ở" : c.status === "reserved" ? "Đặt trước" : "Đã trả"}
+                  </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-1.5 mt-auto">
+              <div className="grid grid-cols-2 gap-1 mt-auto">
                 <button 
                   onClick={() => setSelectedCustomer(c)}
-                  className="bg-slate-50 text-slate-500 hover:bg-slate-100 font-bold rounded-lg py-1.5 text-[8px] transition-colors border border-slate-100"
+                  className="bg-slate-50 text-slate-500 hover:bg-slate-100 font-bold rounded py-1 text-[6.5px] transition-colors border border-slate-100"
                 >
                   Hồ sơ
                 </button>
-                <button className="bg-[#1AB1A5]/10 text-[#1AB1A5] hover:bg-[#1AB1A5]/20 font-bold rounded-lg py-1.5 text-[8px] transition-colors border border-[#1AB1A5]/20">
+                <button className="bg-[#1AB1A5]/10 text-[#1AB1A5] hover:bg-[#1AB1A5]/20 font-bold rounded py-1 text-[6.5px] transition-colors border border-[#1AB1A5]/20">
                   GD
                 </button>
               </div>
@@ -328,7 +526,7 @@ const CustomersPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
       {/* Circle FAB Button - Final Unified Version */}
       <button 
         onClick={() => onNavigate("registration")}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-[#1AB1A5] text-white rounded-full shadow-[0_12px_40px_rgba(26,177,165,0.4)] flex items-center justify-center text-3xl font-light z-[80] hover:scale-110 active:scale-95 transition-all duration-300"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-[#1AB1A5] text-white rounded-full shadow-[0_12px_40px_rgba(26,177,165,0.4)] flex items-center justify-center text-3xl font-light z-[80] hover:scale-110 active:scale-95 transition-all border-4 border-white"
       >
         <span>+</span>
       </button>

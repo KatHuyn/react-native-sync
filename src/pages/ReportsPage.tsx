@@ -62,8 +62,8 @@ const ReportsPage = ({ onNavigate }: ReportsPageProps) => {
     <div className="min-h-screen bg-[#F8FAFC] animate-in fade-in duration-500 pb-24">
       <AppHeader title="Báo cáo" icon={BarChart3} variant="white" />
       
-      <div className="px-4 py-4 space-y-3">
-        <div className="grid grid-cols-1 gap-3">
+      <div className="px-3 py-3 space-y-2">
+        <div className="grid grid-cols-1 gap-1.5">
           {reportCategories.map((report) => (
             <button 
               key={report.id}
@@ -82,22 +82,22 @@ const ReportsPage = ({ onNavigate }: ReportsPageProps) => {
                   onNavigate("inHouseReport");
                 }
               }}
-              className="bg-white rounded-xl p-3 shadow-sm border border-slate-100 flex items-center justify-between active:scale-[0.98] transition-all text-left"
+              className="bg-white rounded-lg p-2 shadow-sm border border-slate-100 flex items-center justify-between active:scale-[0.98] transition-all text-left"
             >
-              <div className="flex items-center gap-3">
-                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", report.bg)}>
-                  <report.icon className={cn("w-5 h-5", report.color)} />
+              <div className="flex items-center gap-2.5">
+                <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", report.bg)}>
+                  <report.icon className={cn("w-4 h-4", report.color)} />
                 </div>
                 <div>
-                  <h3 className="font-black text-[11px] text-slate-800 leading-tight uppercase tracking-tight">
+                  <h3 className="font-black text-[10px] text-slate-800 leading-none uppercase tracking-tight">
                     {report.label}
                   </h3>
-                  <p className="text-[9px] text-slate-400 font-bold mt-0.5 leading-none">
+                  <p className="text-[8px] text-slate-400 font-bold mt-0.5 leading-none">
                     {report.description}
                   </p>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-300" />
+              <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
             </button>
           ))}
         </div>

@@ -340,27 +340,27 @@ const customers: CustomerData[] = [
 const CustomerDetailView = ({ customer, onBack }: { customer: CustomerData; onBack: () => void }) => {
   return (
     <div className="absolute inset-0 z-[60] bg-[#F7F9FC] flex flex-col animate-in fade-in slide-in-from-right duration-300">
-      {/* Cyan Header */}
-      <div className="bg-[#00B4D8] text-white px-4 pt-12 pb-6 flex items-center justify-between shadow-lg">
-        <div className="flex items-center gap-4">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-white/10">
-            <ChevronLeft className="w-6 h-6" />
+      {/* Cyan Header - Miniaturized */}
+      <div className="bg-[#00B4D8] text-white px-4 pt-8 pb-3 flex items-center justify-between shadow-md">
+        <div className="flex items-center gap-3">
+          <button onClick={onBack} className="p-1.5 -ml-1 rounded-full hover:bg-white/10">
+            <ChevronLeft className="w-5 h-5" />
           </button>
           <div>
-            <h2 className="text-xl font-bold leading-tight">{customer.name}</h2>
-            <div className="flex items-center gap-2 mt-1">
-               <span className="text-[10px] bg-[#48CAE4] px-2 py-0.5 rounded-md font-extrabold uppercase">ĐANG Ở</span>
+            <h2 className="text-base font-black leading-tight">{customer.name}</h2>
+            <div className="flex items-center gap-2 mt-0.5">
+               <span className="text-[8px] bg-white/20 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">ĐANG Ở</span>
             </div>
           </div>
         </div>
-        <div className="w-10 h-10 rounded-full border-2 border-white/50 overflow-hidden shadow-md">
+        <div className="w-8 h-8 rounded-full border border-white/40 overflow-hidden shadow-sm shrink-0">
           <img src={`https://i.pravatar.cc/150?u=${customer.id}`} alt="avatar" className="w-full h-full object-cover" />
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
-        {/* Info Card */}
-        <div className="bg-white rounded-[24px] p-6 shadow-sm space-y-5">
+      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-3">
+        {/* Info Card - Micro-Tile */}
+        <div className="bg-white rounded-xl p-3 shadow-sm space-y-2.5">
            {[
              { icon: UserIcon, label: "GIỚI TÍNH", value: customer.gender, color: "bg-cyan-50 text-cyan-600" },
              { icon: Calendar, label: "NGÀY SINH", value: customer.dob, color: "bg-blue-50 text-blue-600" },
@@ -370,70 +370,70 @@ const CustomerDetailView = ({ customer, onBack }: { customer: CustomerData; onBa
              { icon: Globe, label: "QUỐC TỊCH", value: customer.nationality, color: "bg-cyan-50 text-cyan-600" },
              { icon: MapPin, label: "ĐỊA CHỈ", value: customer.address, color: "bg-blue-50 text-blue-600" },
            ].map((item, i) => (
-             <div key={i} className="flex gap-4 items-center">
-                <div className={cn("w-10 h-10 rounded-[14px] flex items-center justify-center shrink-0 shadow-sm", item.color)}>
-                  <item.icon className="w-5 h-5" />
+             <div key={i} className="flex gap-2.5 items-center">
+                <div className={cn("w-6 h-6 rounded flex items-center justify-center shrink-0 border border-slate-50", item.color)}>
+                  <item.icon className="w-3 h-3" />
                 </div>
-                <div>
-                   <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60 tracking-wider font-mono">{item.label}</p>
-                   <p className={cn("text-base font-bold text-[#334155]", item.highlighted && "text-cyan-700 underline")}>{item.value}</p>
+                <div className="min-w-0">
+                   <p className="text-[7.5px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-0.5">{item.label}</p>
+                   <p className={cn("text-[11px] font-black text-[#334155] leading-tight truncate", item.highlighted && "text-cyan-700 underline")}>{item.value}</p>
                 </div>
              </div>
            ))}
         </div>
 
-        {/* Metrics Row */}
-        <div className="grid grid-cols-3 gap-3">
-           <div className="bg-[#F1F5F9] rounded-[20px] p-4 text-center border border-[#E2E8F0]">
-              <p className="text-[9px] font-black text-muted-foreground uppercase">Lượt đặt</p>
-              <p className="text-2xl font-black text-slate-800 mt-1">{customer.bookingCount}</p>
+        {/* Metrics Row - High Density */}
+        <div className="grid grid-cols-3 gap-1.5">
+           <div className="bg-[#F1F5F9] rounded-xl p-2 text-center border border-slate-100 shadow-sm">
+              <p className="text-[7.5px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">Lượt đặt</p>
+              <p className="text-base font-black text-slate-800 leading-none">{customer.bookingCount}</p>
            </div>
-           <div className="bg-[#EDF6F9] rounded-[20px] p-4 text-center border border-[#D1E9F0]">
-              <p className="text-[9px] font-black text-muted-foreground uppercase text-cyan-700/60">Phòng</p>
-              <p className="text-2xl font-black text-[#0077B6] mt-1">{customer.totalRoomRevenue}</p>
+           <div className="bg-[#EDF6F9] rounded-xl p-2 text-center border border-cyan-100 shadow-sm">
+              <p className="text-[7.5px] font-black text-cyan-700/60 uppercase tracking-tighter leading-none mb-1">Phòng</p>
+              <p className="text-base font-black text-[#0077B6] leading-none">{customer.totalRoomRevenue}</p>
            </div>
-           <div className="bg-[#FFF8F0] rounded-[20px] p-4 text-center border border-[#FFEDD5]">
-              <p className="text-[9px] font-black text-muted-foreground uppercase text-orange-700/60">Dịch vụ</p>
-              <p className="text-2xl font-black text-[#A54729] mt-1">{customer.totalServiceRevenue}</p>
+           <div className="bg-[#FFF8F0] rounded-xl p-2 text-center border border-orange-100 shadow-sm">
+              <p className="text-[7.5px] font-black text-orange-700/60 uppercase tracking-tighter leading-none mb-1">Dịch vụ</p>
+              <p className="text-base font-black text-[#A54729] leading-none">{customer.totalServiceRevenue}</p>
            </div>
         </div>
 
-        {/* History List */}
-        <div className="space-y-4 pb-12">
+        {/* History List - Miniaturized */}
+        <div className="space-y-2 pb-8">
            <div className="flex items-center justify-between px-1">
-              <h3 className="text-lg font-black text-[#1E293B] flex items-center gap-2">
+              <h3 className="text-[11px] font-black text-[#1E293B] uppercase tracking-tight">
                 Lịch sử Booking & Dịch vụ
               </h3>
-              <button className="text-xs font-bold text-cyan-600">Tất cả</button>
+              <button className="text-[9px] font-black text-cyan-600 uppercase">Tất cả</button>
            </div>
 
            {customer.history.map((trip) => (
-             <div key={trip.id} className="bg-white rounded-[22px] p-5 shadow-sm border-l-[6px] border-cyan-500 space-y-4">
+             <div key={trip.id} className="bg-white rounded-xl p-2.5 shadow-sm border-l-4 border-cyan-500 space-y-2">
                 <div className="flex items-start justify-between">
                    <div>
-                      <p className="text-[10px] font-bold text-muted-foreground opacity-70 italic tracking-tighter">Mã: {trip.id} | Phòng: {trip.room}</p>
-                      <div className="flex items-center gap-3 mt-2">
+                      <p className="text-[7.5px] font-bold text-slate-400 uppercase tracking-tighter leading-none mb-1.5">Mã: {trip.id} | Phòng: {trip.room}</p>
+                      <div className="flex items-center gap-2">
                          <div className="text-center">
-                            <p className="text-[9px] font-black opacity-50 uppercase">CHECK-IN</p>
-                            <p className="text-sm font-black">{trip.checkIn}</p>
+                            <p className="text-[6.5px] font-black text-slate-300 uppercase leading-none mb-0.5">IN</p>
+                            <p className="text-[10px] font-black leading-none">{trip.checkIn}</p>
                          </div>
-                         <ArrowRight className="w-4 h-4 text-muted-foreground opacity-30" />
+                         <ArrowRight className="w-3 h-3 text-slate-200" />
                          <div className="text-center">
-                            <p className="text-[9px] font-black opacity-50 uppercase">CHECK-OUT</p>
-                            <p className="text-sm font-black">{trip.checkOut}</p>
+                            <p className="text-[6.5px] font-black text-slate-300 uppercase leading-none mb-0.5">OUT</p>
+                            <p className="text-[10px] font-black leading-none">{trip.checkOut}</p>
                          </div>
                       </div>
                    </div>
                    <span className={cn(
-                     "text-[9px] font-bold px-3 py-1 rounded-full uppercase shadow-inner",
-                     trip.status === "active" ? "bg-cyan-500 text-white" : "bg-slate-200 text-slate-500"
+                     "text-[7px] font-black px-2 py-0.5 rounded-sm uppercase tracking-tighter",
+                     trip.status === "active" ? "bg-[#1AB1A5] text-white" : "bg-slate-100 text-slate-400"
                    )}>
-                     {trip.status === "active" ? "Đã nhận phòng" : "Đã trả phòng"}
+                     {trip.status === "active" ? "Check-in" : "Check-out"}
                    </span>
                 </div>
-                <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                   <p className="text-xs font-bold text-slate-500">Chi tiết 3 đêm • {trip.roomType}</p>
-                   <p className="text-base font-black text-cyan-700">{trip.price}</p>
+                <div className="flex items-center justify-between pt-2 border-t border-slate-50">
+                   <p className="text-[8px] font-bold text-slate-400">{trip.roomType}</p>
+                   <p className="text-[11px] font-black text-cyan-700">{trip.price}</p>
                 </div>
              </div>
            ))}

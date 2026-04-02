@@ -102,57 +102,37 @@ const mockArrivals = [
 const ArrivalReportPage = ({ onBack }: ArrivalReportPageProps) => {
   const [selectedArrival, setSelectedArrival] = useState<typeof mockArrivals[0] | null>(null);
 
-  const totalArrivals = 9; // Based on screenshot total
+  const totalArrivals = 9;
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 animate-in fade-in duration-500">
-      <header className="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={onBack}
-            className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4 text-slate-600" />
+    <div className="min-h-screen bg-slate-50 pb-16 animate-in fade-in duration-500">
+      <header className="sticky top-0 z-10 bg-white border-b border-slate-200 px-3 py-1 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <button onClick={onBack} className="p-0.5 hover:bg-slate-100 rounded-lg transition-colors">
+            <ChevronLeft className="w-3.5 h-3.5 text-slate-600" />
           </button>
           <div>
-            <h1 className="text-[10px] font-black text-slate-800 uppercase tracking-tight">Báo cáo phòng đến</h1>
-            <p className="text-[7px] font-bold text-slate-300">02/04/2026 ~ 02/04/2026</p>
+            <h1 className="text-[9px] font-black text-slate-800 uppercase tracking-tight leading-none">Báo cáo phòng đến</h1>
+            <p className="text-[6px] font-bold text-slate-300 leading-none mt-0.5">02/04/2026 · Admin</p>
           </div>
-        </div>
-        <div className="text-right">
-          <div className="flex items-center gap-1 justify-end">
-            <User className="w-2.5 h-2.5 text-slate-400" />
-            <span className="text-[8px] font-black text-slate-500 uppercase">Admin</span>
-          </div>
-          <span className="text-[7px] font-bold text-slate-300">02/04/2026</span>
         </div>
       </header>
 
-      {/* Hotel Address - Mini */}
-      <div className="px-3 py-1.5 bg-white border-b border-slate-100">
-        <div className="flex items-start gap-1.5">
-          <MapPin className="w-3 h-3 text-[#1AB1A5] mt-0.5 shrink-0" />
-          <div>
-            <p className="text-[8px] font-black text-slate-800 uppercase leading-tight">Sandals Island</p>
-            <p className="text-[7px] font-bold text-slate-400 leading-tight">11 Biệt Thự, Phường Nha Trang, Tỉnh Khánh Hòa</p>
-          </div>
+      {/* Hotel Address */}
+      <div className="px-2 py-1 bg-white border-b border-slate-100">
+        <div className="flex items-center gap-1.5">
+          <MapPin className="w-2.5 h-2.5 text-[#1AB1A5] shrink-0" />
+          <p className="text-[7px] font-bold text-slate-400 leading-none">Sandals Island · 11 Biệt Thự, Phường Nha Trang, Khánh Hòa</p>
         </div>
       </div>
 
       {/* Summary Row */}
-      <div className="px-3 pt-3">
-        <div className="bg-slate-800 text-white rounded-xl p-3 flex items-center justify-between shadow-md">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-               <Bed className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <p className="text-[7px] font-black text-white/40 uppercase tracking-widest leading-none mb-0.5">Tổng cộng</p>
-              <h4 className="text-[11px] font-black leading-none uppercase tracking-tighter">{totalArrivals} PHÒNG ĐẾN</h4>
-            </div>
-          </div>
-          <div className="text-right shrink-0">
-             {/* No helper text as requested previously */}
+      <div className="px-2 pt-2">
+        <div className="bg-slate-800 text-white rounded-lg p-2 flex items-center gap-2 shadow-sm">
+          <Bed className="w-3.5 h-3.5 text-white/50" />
+          <div>
+            <p className="text-[6px] font-black text-white/40 uppercase tracking-widest leading-none">Tổng cộng</p>
+            <h4 className="text-[10px] font-black leading-none uppercase tracking-tighter mt-0.5">{totalArrivals} PHÒNG ĐẾN</h4>
           </div>
         </div>
       </div>
@@ -163,18 +143,18 @@ const ArrivalReportPage = ({ onBack }: ArrivalReportPageProps) => {
           <button 
             key={index} 
             onClick={() => setSelectedArrival(arrival)}
-            className="bg-white rounded-md border border-slate-100 p-1.5 flex flex-col items-center justify-center text-center shadow-sm active:scale-95 transition-all h-16"
+            className="bg-white rounded-md border border-slate-100 p-1 flex flex-col items-center justify-center text-center shadow-sm active:scale-95 transition-all h-12"
           >
-            <div className="text-[9px] font-black text-[#1AB1A5] bg-[#1AB1A5]/10 px-1 rounded mb-0.5 w-full truncate">
+            <div className="text-[8px] font-black text-[#1AB1A5] bg-[#1AB1A5]/10 px-1 rounded w-full truncate leading-none">
               {arrival.room}
             </div>
-            <div className="text-[8px] font-black text-slate-400 uppercase line-clamp-1 leading-none w-full mt-0.5">
+            <div className="text-[7px] font-black text-slate-400 uppercase leading-none w-full mt-0.5">
               {arrival.id}
             </div>
-            <div className="text-[6px] font-bold text-slate-300 uppercase leading-none mt-1 truncate w-full">
+            <div className="text-[5px] font-bold text-slate-300 uppercase leading-none mt-0.5 truncate w-full">
               {arrival.company}
             </div>
-            <div className="mt-auto text-[6px] font-black text-slate-400 uppercase leading-none">
+            <div className="text-[6px] font-black text-slate-400 uppercase leading-none mt-auto">
               {arrival.nights}N
             </div>
           </button>

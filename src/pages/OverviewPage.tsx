@@ -68,8 +68,8 @@ const OverviewPage = () => {
           key={f}
           onClick={() => onChange(f)}
           className={cn(
-            "text-xs px-3 py-1 rounded-full transition-all",
-            active === f ? "bg-primary text-primary-foreground font-semibold shadow-sm" : "text-muted-foreground"
+            "text-[9px] px-2 py-0.5 rounded-full transition-all uppercase font-black tracking-tighter",
+            active === f ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"
           )}
         >
           {f}
@@ -304,16 +304,16 @@ const OverviewPage = () => {
             <button 
               onClick={() => setRevenueType("REAL")}
               className={cn(
-                "text-[10px] font-bold px-3 py-1 rounded-lg border transition-all",
+                "text-[9px] font-black px-2 py-0.5 rounded-lg border transition-all uppercase tracking-tighter",
                 revenueType === "REAL" ? "bg-[#1AB1A5]/10 border-[#1AB1A5] text-[#1AB1A5]" : "bg-secondary/50 border-transparent text-muted-foreground"
               )}
             >
-              THẬT
+              THỰC TẾ
             </button>
             <button 
               onClick={() => setRevenueType("EXPECTED")}
               className={cn(
-                "text-[10px] font-bold px-3 py-1 rounded-lg border transition-all",
+                "text-[9px] font-black px-2 py-0.5 rounded-lg border transition-all uppercase tracking-tighter",
                 revenueType === "EXPECTED" ? "bg-[#8B5CF6]/10 border-[#8B5CF6] text-[#8B5CF6]" : "bg-secondary/50 border-transparent text-muted-foreground"
               )}
             >
@@ -485,7 +485,7 @@ const OverviewPage = () => {
             <button 
               onClick={() => setRecentTab("BOOKING")}
               className={cn(
-                "flex-1 py-2 text-xs font-bold transition-all border-b-2",
+                "flex-1 py-1.5 text-[10px] font-black transition-all border-b-2 uppercase tracking-tight",
                 recentTab === "BOOKING" ? "border-primary text-primary" : "border-transparent text-muted-foreground"
               )}
             >
@@ -494,7 +494,7 @@ const OverviewPage = () => {
             <button 
               onClick={() => setRecentTab("PAYMENT")}
               className={cn(
-                "flex-1 py-2 text-xs font-bold transition-all border-b-2",
+                "flex-1 py-1.5 text-[10px] font-black transition-all border-b-2 uppercase tracking-tight",
                 recentTab === "PAYMENT" ? "border-primary text-primary" : "border-transparent text-muted-foreground"
               )}
             >

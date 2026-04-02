@@ -37,14 +37,14 @@ interface Booking {
 }
 
 const initialRooms = [
-  { number: "101", type: "Đơn cơ bản" },
-  { number: "102", type: "Đơn Cao Cấp" },
-  { number: "111", type: "Luxury" },
-  { number: "201", type: "Đơn cơ bản" },
-  { number: "202", type: "VIP" },
-  { number: "301", type: "Deluxe" },
-  { number: "302", type: "Standard" },
-  { number: "401", type: "Standard" },
+  { number: "101", type: "Đơn cơ bản", floor: "Tầng 1" },
+  { number: "102", type: "Đơn Cao Cấp", floor: "Tầng 1" },
+  { number: "111", type: "Luxury", floor: "Tầng 2" },
+  { number: "201", type: "Đơn cơ bản", floor: "Tầng 2" },
+  { number: "202", type: "VIP", floor: "Tầng 2" },
+  { number: "301", type: "Deluxe", floor: "Tầng 3" },
+  { number: "302", type: "Standard", floor: "Tầng 3" },
+  { number: "401", type: "Standard", floor: "Tầng 4" },
 ];
 
 const referenceDate = startOfDay(new Date(2026, 3, 2)); // Today is April 2, 2026
@@ -64,6 +64,7 @@ type InteractionMode =
 const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
   const [activeBookings, setActiveBookings] = useState<Booking[]>(initialBookings);
   const [popoverOpenId, setPopoverOpenId] = useState<string | null>(null);
+  const [groupBy, setGroupBy] = useState<"type" | "floor" | "none">("type");
   
   // Single interaction state - much simpler
   const [interaction, setInteraction] = useState<InteractionMode>(null);
@@ -106,6 +107,19 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
       return [];
     }
   }, [startDate, endDate]);
+  
+  const groupedRooms = useMemo(() => {
+    if (groupBy === "none") return { "Phòng": initialRooms };
+    
+    const groups: Record<string, typeof initialRooms> = {};
+    initialRooms.forEach(room => {
+      const key = groupBy === "type" ? room.type : room.floor;
+      const displayKey = key; // Simplified for high-density UI
+      if (!groups[displayKey]) groups[displayKey] = [];
+      groups[displayKey].push(room);
+    });
+    return groups;
+  }, [groupBy]);
 
   // ===== Helpers =====
   const isSlotAvailable = useCallback((id: string, room: string, start: Date, end: Date) => {
@@ -264,11 +278,11 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
       <AppHeader title="Kế hoạch phòng" icon={Calendar} variant="white" />
       
       <div className="flex-1 flex flex-col pt-2">
-        <div className="bg-[#EEE] border-y border-slate-200 p-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-           <div className="bg-white rounded border border-slate-300 flex items-center gap-1 shrink-0 px-1">
+        <div className="bg-[#EEE] border-y border-slate-200 p-1 flex items-center gap-1 overflow-x-auto scrollbar-hide">
+           <div className="bg-white rounded border border-slate-300 flex items-center gap-0.5 shrink-0 px-0.5">
               <Popover>
                 <PopoverTrigger asChild>
-                  <button className="px-2 py-1 text-[11px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-medium">
+                  <button className="px-1.5 py-0.5 text-[9px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-bold">
                     {format(startDate, "dd/MM/yyyy")}
                   </button>
                 </PopoverTrigger>
@@ -282,11 +296,11 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
                 </PopoverContent>
               </Popover>
 
-              <span className="text-slate-400 text-[10px]">→</span>
+              <span className="text-slate-400 text-[8px]">→</span>
 
               <Popover>
                 <PopoverTrigger asChild>
-                  <button className="px-2 py-1 text-[11px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-medium">
+                  <button className="px-1.5 py-0.5 text-[9px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-bold">
                     {format(endDate, "dd/MM/yyyy")}
                   </button>
                 </PopoverTrigger>
@@ -299,23 +313,47 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
                   />
                 </PopoverContent>
               </Popover>
-              <Calendar className="w-3 h-3 text-[#1AB1A5] mr-1" />
+              <Calendar className="w-2.5 h-2.5 text-[#1AB1A5] mr-0.5" />
            </div>
            
-           <button className="bg-white border border-slate-300 px-4 py-1 rounded text-[11px] font-bold text-slate-700 hover:bg-slate-50 transition-colors shrink-0">Xem</button>
+           <button className="bg-white border border-slate-300 px-2 py-0.5 rounded text-[9px] font-black uppercase text-slate-700 hover:bg-slate-50 transition-colors shrink-0 tracking-tighter">Xem</button>
            
            <div className="flex bg-white rounded border border-slate-300 overflow-hidden shrink-0">
-              <button className="px-3 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-50 border-r border-slate-200">Ngày</button>
-              <button className="px-3 py-1 text-[11px] font-bold bg-[#1AB1A5] text-white">Tháng</button>
+              <button className="px-2 py-0.5 text-[9px] font-black uppercase text-slate-700 hover:bg-slate-50 border-r border-slate-200 tracking-tighter">Ngày</button>
+              <button className="px-2 py-0.5 text-[9px] font-black uppercase bg-[#1AB1A5] text-white tracking-tighter">Tháng</button>
            </div>
 
-           <div className="flex gap-1.5 ml-1 shrink-0">
-              <button className="bg-white border border-slate-300 px-2 py-1 rounded text-[11px] font-bold text-slate-700 flex items-center gap-1">Loại <ChevronDown className="w-3 h-3 text-slate-400" /></button>
-              <button className="bg-white border border-slate-300 px-2 py-1 rounded text-[11px] font-bold text-slate-700 flex items-center gap-1">Tầng <ChevronDown className="w-3 h-3 text-slate-400" /></button>
-              <button className="bg-[#1AB1A5] border border-[#148e85] px-2 py-1 rounded text-[11px] font-bold text-white flex items-center gap-1 shadow-sm">Phòng <ChevronDown className="w-3 h-3 text-white/70" /></button>
+           <div className="flex bg-white rounded border border-slate-300 overflow-hidden shrink-0">
+              <button 
+                onClick={() => setGroupBy("type")}
+                className={cn(
+                  "px-2 py-0.5 text-[9px] font-black uppercase tracking-tighter border-r border-slate-200 transition-colors",
+                  groupBy === "type" ? "bg-[#1AB1A5] text-white" : "text-slate-700 hover:bg-slate-50"
+                )}
+              >
+                Loại phòng
+              </button>
+              <button 
+                onClick={() => setGroupBy("floor")}
+                className={cn(
+                  "px-2 py-0.5 text-[9px] font-black uppercase tracking-tighter border-r border-slate-200 transition-colors",
+                  groupBy === "floor" ? "bg-[#1AB1A5] text-white" : "text-slate-700 hover:bg-slate-50"
+                )}
+              >
+                Tầng
+              </button>
+              <button 
+                onClick={() => setGroupBy("none")}
+                className={cn(
+                  "px-2 py-0.5 text-[9px] font-black uppercase tracking-tighter transition-colors",
+                  groupBy === "none" ? "bg-[#1AB1A5] text-white" : "text-slate-700 hover:bg-slate-50"
+                )}
+              >
+                Phòng
+              </button>
            </div>
 
-           <HelpCircle className="w-5 h-5 text-[#1AB1A5] ml-auto cursor-pointer shrink-0" />
+           <HelpCircle className="w-4 h-4 text-[#1AB1A5] ml-auto cursor-pointer shrink-0" />
         </div>
 
         {/* Current Month Active Indicator */}
@@ -330,7 +368,7 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
         </div>
 
         {/* Timeline Grid Content */}
-        <div ref={gridRef} className="flex-1 bg-white overflow-x-auto scrollbar-hide relative group">
+        <div ref={gridRef} className="flex-1 bg-white overflow-x-auto scrollbar-thin relative group">
            <div className="min-w-[700px] flex flex-col h-full">
               {/* Table Header */}
               <div className="flex sticky top-0 z-30">
@@ -348,151 +386,163 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
                  ))}
               </div>
 
-              {/* Room Rows */}
+              {/* Room Rows by Group */}
               <div className="flex-1 divide-y divide-slate-100 min-h-[60vh]">
-                 {initialRooms.map((room) => {
-                   const bookingList = activeBookings.filter(b => b.roomNumber === room.number);
-                   return (
-                     <div key={room.number} className="flex h-8 bg-white" data-room-row={room.number}>
-                        <div className="w-20 shrink-0 flex items-center px-1 border-r border-slate-200 bg-[#F9F9F9] sticky left-0 z-20" data-room-row={room.number}>
-                           <span className="text-[9px] font-black text-slate-800 w-6 tracking-normal">{room.number}</span>
-                           <span className="text-[7px] text-slate-500 truncate leading-none uppercase font-bold tracking-normal">{room.type}</span>
+                 {Object.entries(groupedRooms).map(([groupName, rooms]) => (
+                   <div key={groupName} className="flex flex-col">
+                      {groupBy !== "none" && (
+                        <div className="flex h-4 bg-[#FFA24E]">
+                           <div className="w-20 shrink-0 flex items-center px-2 bg-[#FFA24E] border-r border-white/20 sticky left-0 z-20">
+                              <span className="text-[7px] font-black text-white uppercase tracking-tight whitespace-nowrap">{groupName}</span>
+                           </div>
+                           <div className="flex-1 border-b border-white/10" />
                         </div>
-                        <div className="flex-1 flex relative">
-                           {days.map((d) => (
-                             <div 
-                               key={d.date.toISOString()} 
-                               className="flex-1 border-r border-slate-50 h-full hover:bg-slate-50 transition-colors"
-                             />
-                           ))}
-
-                           {/* Ghost Preview */}
-                           {ghostPreview && ghostPreview.roomNumber === room.number && (
-                             <div 
-                               className={cn(
-                                 "absolute h-5 top-1.5 rounded-sm border-2 border-dashed z-50 pointer-events-none flex items-center px-1 overflow-hidden",
-                                 ghostPreview.isValid 
-                                   ? "bg-emerald-400/25 border-emerald-500" 
-                                   : "bg-rose-500/25 border-rose-500"
-                               )}
-                               style={{
-                                 left: `calc(${(differenceInDays(ghostPreview.startDate, startDate) / days.length) * 100}% + 1px)`,
-                                 width: `calc(${(differenceInDays(ghostPreview.endDate, ghostPreview.startDate) / days.length) * 100}% - 2px)`
-                               }}
-                             >
-                                <span className={cn(
-                                  "text-[6px] font-black uppercase whitespace-nowrap",
-                                  ghostPreview.isValid ? "text-emerald-700" : "text-rose-600"
-                                )}>
-                                  {ghostPreview.isValid 
-                                    ? differenceInDays(ghostPreview.endDate, ghostPreview.startDate) + " ngày"
-                                    : "Đã có khách"}
-                                </span>
+                      )}
+                      {rooms.map((room) => {
+                        const bookingList = activeBookings.filter(b => b.roomNumber === room.number);
+                        return (
+                          <div key={room.number} className="flex h-8 bg-white" data-room-row={room.number}>
+                             <div className="w-20 shrink-0 flex items-center px-1 border-r border-slate-200 bg-[#F9F9F9] sticky left-0 z-20" data-room-row={room.number}>
+                                <span className="text-[9px] font-black text-slate-800 w-6 tracking-normal">{room.number}</span>
+                                <span className="text-[7px] text-slate-500 truncate leading-none uppercase font-bold tracking-normal">{room.type}</span>
                              </div>
-                           )}
-                           
-                           {/* Booking Bars */}
-                           {bookingList.map((booking) => {
-                             const startDiff = differenceInDays(booking.startDate, startDate);
-                             const duration = differenceInDays(booking.endDate, booking.startDate);
-                             
-                             if (startDiff + duration < 0 || startDiff >= days.length) return null;
-                             
-                             const leftPercent = (startDiff / days.length) * 100;
-                             const widthPercent = (duration / days.length) * 100;
-                             const isActive = interaction?.bookingId === booking.id;
+                             <div className="flex-1 flex relative">
+                                {days.map((d) => (
+                                  <div 
+                                    key={d.date.toISOString()} 
+                                    className="flex-1 border-r border-slate-50 h-full hover:bg-slate-50 transition-colors"
+                                  />
+                                ))}
 
-                             return (
-                               <Popover 
-                                 key={booking.id} 
-                                 open={popoverOpenId === booking.id && !interaction} 
-                                 onOpenChange={(open) => {
-                                   if (!interaction) {
-                                     setPopoverOpenId(open ? booking.id : null);
-                                   }
-                                 }}
-                               >
-                                 <PopoverTrigger asChild>
-                                   <div
-                                     onPointerDown={(e) => startDrag(booking.id, e)}
-                                     className={cn(
-                                       booking.color,
-                                       "absolute h-5 top-1.5 rounded-sm shadow-sm border border-white/20 px-1 cursor-pointer z-10 flex items-center group/bar select-none",
-                                       isActive && "ring-2 ring-white/60 shadow-lg z-30",
-                                     )}
-                                     style={{
-                                       left: `calc(${leftPercent}% + 1px)`,
-                                       width: `calc(${widthPercent}% - 2px)`,
-                                       touchAction: 'none'
-                                     }}
-                                   >
-                                      {/* Left Resize Handle */}
-                                      <div 
-                                        className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize z-20 flex items-center justify-start"
-                                        onPointerDown={(e) => startResize(booking.id, 'start', e)}
-                                      >
-                                        <div className="w-1 h-3 bg-white/50 rounded-full ml-0.5" />
-                                      </div>
-                                      
-                                      <span className="text-[7px] font-black text-white truncate drop-shadow-sm tracking-normal flex-1 text-center pointer-events-none">
-                                        {booking.guest}
-                                      </span>
+                                {/* Ghost Preview */}
+                                {ghostPreview && ghostPreview.roomNumber === room.number && (
+                                  <div 
+                                    className={cn(
+                                      "absolute h-5 top-1.5 rounded-sm border-2 border-dashed z-50 pointer-events-none flex items-center px-1 overflow-hidden",
+                                      ghostPreview.isValid 
+                                        ? "bg-emerald-400/25 border-emerald-500" 
+                                        : "bg-rose-500/25 border-rose-500"
+                                    )}
+                                    style={{
+                                      left: `calc(${(differenceInDays(ghostPreview.startDate, startDate) / days.length) * 100}% + 1px)`,
+                                      width: `calc(${(differenceInDays(ghostPreview.endDate, ghostPreview.startDate) / days.length) * 100}% - 2px)`
+                                    }}
+                                  >
+                                     <span className={cn(
+                                       "text-[6px] font-black uppercase whitespace-nowrap",
+                                       ghostPreview.isValid ? "text-emerald-700" : "text-rose-600"
+                                     )}>
+                                       {ghostPreview.isValid 
+                                         ? differenceInDays(ghostPreview.endDate, ghostPreview.startDate) + " ngày"
+                                         : "Đã có khách"}
+                                     </span>
+                                  </div>
+                                )}
+                                
+                                {/* Booking Bars */}
+                                {bookingList.map((booking) => {
+                                  const startDiff = differenceInDays(booking.startDate, startDate);
+                                  const duration = differenceInDays(booking.endDate, booking.startDate);
+                                  
+                                  if (startDiff + duration < 0 || startDiff >= days.length) return null;
+                                  
+                                  const leftPercent = (startDiff / days.length) * 100;
+                                  const widthPercent = (duration / days.length) * 100;
+                                  const isActive = interaction?.bookingId === booking.id;
 
-                                      {/* Right Resize Handle */}
-                                      <div 
-                                        className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize z-20 flex items-center justify-end"
-                                        onPointerDown={(e) => startResize(booking.id, 'end', e)}
-                                      >
-                                        <div className="w-1 h-3 bg-white/50 rounded-full mr-0.5" />
-                                      </div>
-                                   </div>
-                                 </PopoverTrigger>
-                                 <PopoverContent className="w-56 p-0 overflow-hidden border-slate-200 shadow-xl rounded-lg" align="start">
-                                    <div className="bg-white text-[10px]">
-                                       <div className="bg-slate-50 px-3 py-2 border-b border-slate-100 flex justify-between items-center">
-                                          <span className="font-black text-slate-400 uppercase tracking-widest text-[8px]">Chi tiết đặt phòng</span>
-                                          <span className="font-bold text-[#1AB1A5]">#{booking.id}</span>
-                                       </div>
-                                       <div className="p-3 space-y-2">
-                                          <div className="flex justify-between">
-                                             <span className="text-slate-400">Khách hàng:</span>
-                                             <span className="font-bold text-slate-800">{booking.guest}</span>
-                                          </div>
-                                          <div className="flex justify-between">
-                                             <span className="text-slate-400">Phòng:</span>
-                                             <span className="font-bold text-slate-800">{booking.roomNumber} - {booking.roomType}</span>
-                                          </div>
-                                          <div className="flex justify-between">
-                                             <span className="text-slate-400">Ngày đến:</span>
-                                             <span className="font-bold text-slate-800">{format(booking.startDate, "dd/MM/yyyy")}</span>
-                                          </div>
-                                          <div className="flex justify-between">
-                                             <span className="text-slate-400">Ngày đi:</span>
-                                             <span className="font-bold text-slate-800">{format(booking.endDate, "dd/MM/yyyy")}</span>
-                                          </div>
-                                          <div className="flex justify-between border-t border-slate-50 pt-2">
-                                             <span className="text-slate-400">Giá phòng:</span>
-                                             <span className="font-black text-[#1AB1A5]">{booking.price?.toLocaleString()} VND</span>
-                                          </div>
-                                          {booking.note && (
-                                             <div className="bg-slate-50 p-2 rounded text-[9px] text-slate-500 italic mt-2 border-l-2 border-slate-200">
-                                                "{booking.note}"
-                                             </div>
+                                  return (
+                                    <Popover 
+                                      key={booking.id} 
+                                      open={popoverOpenId === booking.id && !interaction} 
+                                      onOpenChange={(open) => {
+                                        if (!interaction) {
+                                          setPopoverOpenId(open ? booking.id : null);
+                                        }
+                                      }}
+                                    >
+                                      <PopoverTrigger asChild>
+                                        <div
+                                          onPointerDown={(e) => startDrag(booking.id, e)}
+                                          className={cn(
+                                            booking.color,
+                                            "absolute h-5 top-1.5 rounded-sm shadow-sm border border-white/20 px-1 cursor-pointer z-10 flex items-center group/bar select-none",
+                                            isActive && "ring-2 ring-white/60 shadow-lg z-30",
                                           )}
-                                       </div>
-                                       <div className="grid grid-cols-2 border-t border-slate-100">
-                                          <button className="py-2 text-slate-500 hover:bg-slate-50 font-bold border-r border-slate-100 transition-colors">Sửa</button>
-                                          <button className="py-2 text-rose-500 hover:bg-rose-50 font-bold transition-colors">Hủy</button>
-                                       </div>
-                                    </div>
-                                 </PopoverContent>
-                               </Popover>
-                             );
-                           })}
-                        </div>
-                     </div>
-                   );
-                 })}
+                                          style={{
+                                            left: `calc(${leftPercent}% + 1px)`,
+                                            width: `calc(${widthPercent}% - 2px)`,
+                                            touchAction: 'none'
+                                          }}
+                                        >
+                                           {/* Left Resize Handle */}
+                                           <div 
+                                             className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize z-20 flex items-center justify-start"
+                                             onPointerDown={(e) => startResize(booking.id, 'start', e)}
+                                           >
+                                             <div className="w-1 h-3 bg-white/50 rounded-full ml-0.5" />
+                                           </div>
+                                           
+                                           <span className="text-[7px] font-black text-white truncate drop-shadow-sm tracking-normal flex-1 text-center pointer-events-none">
+                                             {booking.guest}
+                                           </span>
+
+                                           {/* Right Resize Handle */}
+                                           <div 
+                                             className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize z-20 flex items-center justify-end"
+                                             onPointerDown={(e) => startResize(booking.id, 'end', e)}
+                                           >
+                                             <div className="w-1 h-3 bg-white/50 rounded-full mr-0.5" />
+                                           </div>
+                                        </div>
+                                      </PopoverTrigger>
+                                      <PopoverContent className="w-56 p-0 overflow-hidden border-slate-200 shadow-xl rounded-lg" align="start">
+                                         <div className="bg-white text-[10px]">
+                                            <div className="bg-slate-50 px-3 py-2 border-b border-slate-100 flex justify-between items-center">
+                                               <span className="font-black text-slate-400 uppercase tracking-widest text-[8px]">Chi tiết đặt phòng</span>
+                                               <span className="font-bold text-[#1AB1A5]">#{booking.id}</span>
+                                            </div>
+                                            <div className="p-3 space-y-2">
+                                               <div className="flex justify-between">
+                                                  <span className="text-slate-400">Khách hàng:</span>
+                                                  <span className="font-bold text-slate-800">{booking.guest}</span>
+                                               </div>
+                                               <div className="flex justify-between">
+                                                  <span className="text-slate-400">Phòng:</span>
+                                                  <span className="font-bold text-slate-800">{booking.roomNumber} - {booking.roomType}</span>
+                                               </div>
+                                               <div className="flex justify-between">
+                                                  <span className="text-slate-400">Ngày đến:</span>
+                                                  <span className="font-bold text-slate-800">{format(booking.startDate, "dd/MM/yyyy")}</span>
+                                               </div>
+                                               <div className="flex justify-between">
+                                                  <span className="text-slate-400">Ngày đi:</span>
+                                                  <span className="font-bold text-slate-800">{format(booking.endDate, "dd/MM/yyyy")}</span>
+                                               </div>
+                                               <div className="flex justify-between border-t border-slate-50 pt-2">
+                                                  <span className="text-slate-400">Giá phòng:</span>
+                                                  <span className="font-black text-[#1AB1A5]">{booking.price?.toLocaleString()} VND</span>
+                                               </div>
+                                               {booking.note && (
+                                                  <div className="bg-slate-50 p-2 rounded text-[9px] text-slate-500 italic mt-2 border-l-2 border-slate-200">
+                                                     "{booking.note}"
+                                                  </div>
+                                               )}
+                                            </div>
+                                            <div className="grid grid-cols-2 border-t border-slate-100">
+                                               <button className="py-2 text-slate-500 hover:bg-slate-50 font-bold border-r border-slate-100 transition-colors">Sửa</button>
+                                               <button className="py-2 text-rose-500 hover:bg-rose-50 font-bold transition-colors">Hủy</button>
+                                            </div>
+                                         </div>
+                                      </PopoverContent>
+                                    </Popover>
+                                  );
+                                })}
+                             </div>
+                          </div>
+                        );
+                      })}
+                   </div>
+                 ))}
               </div>
 
               {/* Sticky Summary Footer */}

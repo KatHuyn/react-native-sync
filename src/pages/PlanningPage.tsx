@@ -279,11 +279,11 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
       
       <div className="flex-1 flex flex-col pt-2">
         <div className="bg-[#EEE] border-y border-slate-200 p-1 flex items-center gap-1 overflow-x-auto scrollbar-hide">
-           <div className="bg-white rounded border border-slate-300 flex items-center gap-0.5 shrink-0 px-0.5">
+           <div className="flex bg-white rounded border border-slate-300 px-1 py-0 items-center shrink-0">
               <Popover>
                 <PopoverTrigger asChild>
-                  <button className="px-1.5 py-0.5 text-[9px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-bold">
-                    {format(startDate, "dd/MM/yyyy")}
+                  <button className="px-1 py-0.5 text-[8px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-black tracking-tighter">
+                    {format(startDate, "dd/MM/yy")}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -295,13 +295,11 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
                   />
                 </PopoverContent>
               </Popover>
-
-              <span className="text-slate-400 text-[8px]">→</span>
-
+              <span className="mx-0.5 text-slate-300 text-[8px]">→</span>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button className="px-1.5 py-0.5 text-[9px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-bold">
-                    {format(endDate, "dd/MM/yyyy")}
+                  <button className="px-1 py-0.5 text-[8px] text-slate-600 hover:bg-slate-50 rounded transition-colors outline-none font-black tracking-tighter">
+                    {format(endDate, "dd/MM/yy")}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -313,30 +311,29 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
                   />
                 </PopoverContent>
               </Popover>
-              <Calendar className="w-2.5 h-2.5 text-[#1AB1A5] mr-0.5" />
            </div>
            
            <button className="bg-white border border-slate-300 px-2 py-0.5 rounded text-[9px] font-black uppercase text-slate-700 hover:bg-slate-50 transition-colors shrink-0 tracking-tighter">Xem</button>
            
            <div className="flex bg-white rounded border border-slate-300 overflow-hidden shrink-0">
-              <button className="px-2 py-0.5 text-[9px] font-black uppercase text-slate-700 hover:bg-slate-50 border-r border-slate-200 tracking-tighter">Ngày</button>
-              <button className="px-2 py-0.5 text-[9px] font-black uppercase bg-[#1AB1A5] text-white tracking-tighter">Tháng</button>
+              <button className="px-1.5 py-0.5 text-[8.5px] font-black uppercase text-slate-700 hover:bg-slate-50 border-r border-slate-200 tracking-tighter">Ngày</button>
+              <button className="px-1.5 py-0.5 text-[8.5px] font-black uppercase bg-[#1AB1A5] text-white tracking-tighter">Tháng</button>
            </div>
 
            <div className="flex bg-white rounded border border-slate-300 overflow-hidden shrink-0">
               <button 
                 onClick={() => setGroupBy("type")}
                 className={cn(
-                  "px-2 py-0.5 text-[9px] font-black uppercase tracking-tighter border-r border-slate-200 transition-colors",
+                  "px-1.5 py-0.5 text-[8.5px] font-black uppercase tracking-tighter border-r border-slate-200 transition-colors",
                   groupBy === "type" ? "bg-[#1AB1A5] text-white" : "text-slate-700 hover:bg-slate-50"
                 )}
               >
-                Loại phòng
+                Loại
               </button>
               <button 
                 onClick={() => setGroupBy("floor")}
                 className={cn(
-                  "px-2 py-0.5 text-[9px] font-black uppercase tracking-tighter border-r border-slate-200 transition-colors",
+                  "px-1.5 py-0.5 text-[8.5px] font-black uppercase tracking-tighter border-r border-slate-200 transition-colors",
                   groupBy === "floor" ? "bg-[#1AB1A5] text-white" : "text-slate-700 hover:bg-slate-50"
                 )}
               >
@@ -345,15 +342,13 @@ const PlanningPage = ({ onNavigate }: { onNavigate: (t: string) => void }) => {
               <button 
                 onClick={() => setGroupBy("none")}
                 className={cn(
-                  "px-2 py-0.5 text-[9px] font-black uppercase tracking-tighter transition-colors",
+                  "px-1.5 py-0.5 text-[8.5px] font-black uppercase tracking-tighter transition-colors",
                   groupBy === "none" ? "bg-[#1AB1A5] text-white" : "text-slate-700 hover:bg-slate-50"
                 )}
               >
                 Phòng
               </button>
            </div>
-
-           <HelpCircle className="w-4 h-4 text-[#1AB1A5] ml-auto cursor-pointer shrink-0" />
         </div>
 
         {/* Current Month Active Indicator */}

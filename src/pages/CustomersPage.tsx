@@ -362,22 +362,17 @@ const CustomerDetailView = ({ customer, onBack }: { customer: CustomerData; onBa
         {/* Info Card - Micro-Tile */}
         <div className="bg-white rounded-xl p-3 shadow-sm space-y-2.5">
            {[
-             { icon: UserIcon, label: "GIỚI TÍNH", value: customer.gender, color: "bg-cyan-50 text-cyan-600" },
-             { icon: Calendar, label: "NGÀY SINH", value: customer.dob, color: "bg-blue-50 text-blue-600" },
-             { icon: CreditCard, label: "CCCD", value: customer.idNumber, color: "bg-indigo-50 text-indigo-600" },
-             { icon: Phone, label: "ĐIỆN THOẠI", value: customer.phone, color: "bg-teal-50 text-teal-600", highlighted: true },
-             { icon: Mail, label: "EMAIL", value: customer.email, color: "bg-sky-50 text-sky-600" },
-             { icon: Globe, label: "QUỐC TỊCH", value: customer.nationality, color: "bg-cyan-50 text-cyan-600" },
-             { icon: MapPin, label: "ĐỊA CHỈ", value: customer.address, color: "bg-blue-50 text-blue-600" },
+             { label: "GIỚI TÍNH", value: customer.gender },
+             { label: "NGÀY SINH", value: customer.dob },
+             { label: "CCCD", value: customer.idNumber },
+             { label: "ĐIỆN THOẠI", value: customer.phone, highlighted: true },
+             { label: "EMAIL", value: customer.email },
+             { label: "QUỐC TỊCH", value: customer.nationality },
+             { label: "ĐIỆN CHỈ", value: customer.address },
            ].map((item, i) => (
-             <div key={i} className="flex gap-2.5 items-center">
-                <div className={cn("w-6 h-6 rounded flex items-center justify-center shrink-0 border border-slate-50", item.color)}>
-                  <item.icon className="w-3 h-3" />
-                </div>
-                <div className="min-w-0">
-                   <p className="text-[7.5px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-0.5">{item.label}</p>
-                   <p className={cn("text-[11px] font-black text-[#334155] leading-tight truncate", item.highlighted && "text-cyan-700 underline")}>{item.value}</p>
-                </div>
+             <div key={i} className="min-w-0">
+                <p className="text-[7px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-0.5">{item.label}</p>
+                <p className={cn("text-[11px] font-black text-[#334155] leading-tight truncate", item.highlighted && "text-cyan-700 underline")}>{item.value}</p>
              </div>
            ))}
         </div>

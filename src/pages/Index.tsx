@@ -19,7 +19,7 @@ const pages: Record<string, React.ComponentType<any>> = {
 };
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState<string>("overview");
   const [prevTab, setPrevTab] = useState("overview");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 

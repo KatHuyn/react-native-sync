@@ -43,7 +43,18 @@ const RegistrationPage = ({ onBack }: RegistrationPageProps) => {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [babies, setBabies] = useState(0);
-  const [hasBreakfast, setHasBreakfast] = useState(true);
+
+  const [rooms, setRooms] = useState([
+    { id: 1, name: "Đơn cơ bản", count: 0, adults: 0, children: 0, babies: 0, price: 0, hasBreakfast: true },
+    { id: 2, name: "Đôn Cao Cấp", count: 0, adults: 0, children: 0, babies: 0, price: 0, hasBreakfast: true },
+    { id: 3, name: "Luxury", count: 0, adults: 0, children: 0, babies: 0, price: 0, hasBreakfast: true },
+    { id: 4, name: "Luxury Extreme", count: 0, adults: 0, children: 0, babies: 0, price: 0, hasBreakfast: true },
+    { id: 5, name: "Double Room", count: 0, adults: 0, children: 0, babies: 0, price: 0, hasBreakfast: true },
+  ]);
+
+  const updateRoom = (id: number, field: string, value: any) => {
+    setRooms(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
+  };
 
   return (
     <div className="min-h-screen bg-white pb-12 animate-in fade-in duration-500">
@@ -105,13 +116,14 @@ const RegistrationPage = ({ onBack }: RegistrationPageProps) => {
                       <th className="p-2 text-[8px] font-black text-slate-400 uppercase text-center">N.Lớn</th>
                       <th className="p-2 text-[8px] font-black text-slate-400 uppercase text-center">Trẻ em</th>
                       <th className="p-2 text-[8px] font-black text-slate-400 uppercase text-center">Em bé</th>
+                      <th className="p-2 text-[8px] font-black text-slate-400 uppercase text-center">Ăn sáng</th>
                    </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                   {["Đơn cơ bản", "Đôn Cao Cấp", "Luxury", "Luxury Extreme", "Double Room"].map((room, i) => (
-                      <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                   {rooms.map((room) => (
+                      <tr key={room.id} className="hover:bg-slate-50/50 transition-colors">
                          <td className="p-2">
-                            <span className="text-[9px] font-black text-slate-700">{room}</span>
+                            <span className="text-[9px] font-black text-slate-700">{room.name}</span>
                          </td>
                          <td className="p-2">
                             <div className="flex items-center gap-1">
@@ -123,9 +135,19 @@ const RegistrationPage = ({ onBack }: RegistrationPageProps) => {
                          <td className="p-2 text-center text-[9px] font-black text-emerald-600">12</td>
                          <td className="p-2">
                             <div className="flex items-center justify-center gap-1">
-                               <button className="w-5 h-5 rounded-full bg-slate-50 border border-slate-100 text-[8px] font-black">-</button>
-                               <span className="text-[9px] font-black">0</span>
-                               <button className="w-5 h-5 rounded-full bg-[#1AB1A5] text-white text-[8px] font-black">+</button>
+                               <button 
+                                 onClick={() => updateRoom(room.id, "count", Math.max(0, room.count - 1))}
+                                 className="w-5 h-5 rounded-full bg-slate-50 border border-slate-100 text-[8px] font-black"
+                               >
+                                 -
+                               </button>
+                               <span className="text-[9px] font-black">{room.count}</span>
+                               <button 
+                                 onClick={() => updateRoom(room.id, "count", room.count + 1)}
+                                 className="w-5 h-5 rounded-full bg-[#1AB1A5] text-white text-[8px] font-black"
+                               >
+                                 +
+                               </button>
                             </div>
                          </td>
                          <td className="p-2">
@@ -133,30 +155,75 @@ const RegistrationPage = ({ onBack }: RegistrationPageProps) => {
                          </td>
                          <td className="p-2">
                             <div className="flex items-center gap-1">
-                               <input type="text" defaultValue="0" className="w-20 h-7 text-[9px] font-black text-[#1AB1A5] border border-slate-100 rounded px-1" />
+                               <input 
+                                 type="text" 
+                                 value={room.price} 
+                                 onChange={(e) => {
+                                   const val = e.target.value.replace(/[^0-9]/g, "");
+                                   updateRoom(room.id, "price", val ? parseInt(val) : 0);
+                                 }}
+                                 className="w-20 h-7 text-[9px] font-black text-[#1AB1A5] border border-slate-100 rounded px-1" 
+                               />
                                <span className="text-[7px] text-slate-400 font-black">VND</span>
                             </div>
                          </td>
                          <td className="p-2">
                             <div className="flex items-center justify-center gap-1">
-                               <button className="w-5 h-5 rounded-full bg-slate-50 border border-slate-100 text-[8px] font-black">-</button>
-                               <span className="text-[9px] font-black">0</span>
-                               <button className="w-5 h-5 rounded-full bg-[#1AB1A5] text-white text-[8px] font-black">+</button>
+                               <button 
+                                 onClick={() => updateRoom(room.id, "adults", Math.max(0, room.adults - 1))}
+                                 className="w-5 h-5 rounded-full bg-slate-50 border border-slate-100 text-[8px] font-black"
+                               >
+                                 -
+                               </button>
+                               <span className="text-[9px] font-black">{room.adults}</span>
+                               <button 
+                                 onClick={() => updateRoom(room.id, "adults", room.adults + 1)}
+                                 className="w-5 h-5 rounded-full bg-[#1AB1A5] text-white text-[8px] font-black"
+                               >
+                                 +
+                               </button>
                             </div>
                          </td>
                          <td className="p-2">
                             <div className="flex items-center justify-center gap-1">
-                               <button className="w-5 h-5 rounded-full bg-slate-50 border border-slate-100 text-[8px] font-black">-</button>
-                               <span className="text-[9px] font-black">0</span>
-                               <button className="w-5 h-5 rounded-full bg-[#1AB1A5] text-white text-[8px] font-black">+</button>
+                               <button 
+                                 onClick={() => updateRoom(room.id, "children", Math.max(0, room.children - 1))}
+                                 className="w-5 h-5 rounded-full bg-slate-50 border border-slate-100 text-[8px] font-black"
+                               >
+                                 -
+                               </button>
+                               <span className="text-[9px] font-black">{room.children}</span>
+                               <button 
+                                 onClick={() => updateRoom(room.id, "children", room.children + 1)}
+                                 className="w-5 h-5 rounded-full bg-[#1AB1A5] text-white text-[8px] font-black"
+                               >
+                                 +
+                               </button>
                             </div>
                          </td>
                          <td className="p-2">
                             <div className="flex items-center justify-center gap-1">
-                               <button className="w-5 h-5 rounded-full bg-slate-50 border border-slate-100 text-[8px] font-black">-</button>
-                               <span className="text-[9px] font-black">0</span>
-                               <button className="w-5 h-5 rounded-full bg-[#1AB1A5] text-white text-[8px] font-black">+</button>
+                               <button 
+                                 onClick={() => updateRoom(room.id, "babies", Math.max(0, room.babies - 1))}
+                                 className="w-5 h-5 rounded-full bg-slate-50 border border-slate-100 text-[8px] font-black"
+                               >
+                                 -
+                               </button>
+                               <span className="text-[9px] font-black">{room.babies}</span>
+                               <button 
+                                 onClick={() => updateRoom(room.id, "babies", room.babies + 1)}
+                                 className="w-5 h-5 rounded-full bg-[#1AB1A5] text-white text-[8px] font-black"
+                               >
+                                 +
+                               </button>
                             </div>
+                         </td>
+                         <td className="p-2 text-center">
+                            <Switch 
+                               checked={room.hasBreakfast} 
+                               onCheckedChange={(checked) => updateRoom(room.id, "hasBreakfast", checked)}
+                               className="scale-50 data-[state=checked]:bg-[#1AB1A5]" 
+                            />
                          </td>
                       </tr>
                    ))}
@@ -165,17 +232,7 @@ const RegistrationPage = ({ onBack }: RegistrationPageProps) => {
           </div>
         </div>
 
-        {/* Global Options - Full Width Compact */}
-        <div className="bg-white rounded-xl p-2.5 border border-slate-100 flex items-center justify-between">
-           <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-orange-50 text-orange-500 rounded flex items-center justify-center text-sm">🥐</div>
-              <div>
-                 <Label className="text-[9px] font-black text-slate-700">Tiêu chuẩn ăn sáng</Label>
-                 <p className="text-[7px] text-slate-400 font-black uppercase mt-0.5">Áp dụng cho mọi phòng được chọn</p>
-              </div>
-           </div>
-           <Switch className="scale-75 data-[state=checked]:bg-[#1AB1A5]" />
-        </div>
+
 
         {/* Textarea Area */}
         <div className="space-y-1">

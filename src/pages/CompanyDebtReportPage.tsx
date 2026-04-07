@@ -1,18 +1,42 @@
 import { useState } from "react";
-import { ChevronLeft, Building2, Wallet, Clock, FileText, Hash, Info, User, Calendar, CreditCard, Banknote, CheckCircle2, AlertCircle, Receipt, MapPin } from "lucide-react";
+import { ChevronLeft, Building2, Wallet, MapPin, User, AlertCircle, CheckCircle2, CreditCard, Banknote, FileText, Receipt, ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import ReportTable, { Column } from "@/components/ReportTable";
 
 interface CompanyDebtReportPageProps {
   onBack: () => void;
 }
 
-const mockCompanyDebts = [
+interface DebtItem {
+  id: string;
+  room: string;
+  arrival: string;
+  departure: string;
+  note: string;
+  amount: string;
+  cashier: string;
+  date: string;
+  isPaid: boolean;
+}
+
+interface PaymentItem {
+  date: string;
+  method: string;
+  note: string;
+  amount: string;
+  user: string;
+}
+
+interface CompanyDebtRow {
+  id: string;
+  name: string;
+  totalDebt: string;
+  remainingDebt: string;
+  items: DebtItem[];
+  payments: PaymentItem[];
+}
+
+const mockCompanyDebts: CompanyDebtRow[] = [
   {
     id: "ctrip",
     name: "CTRIP",
@@ -31,7 +55,10 @@ const mockCompanyDebts = [
       { id: "SI5226", room: "5226", arrival: "31/03/2026", departure: "01/04/2026", note: "ĐÃ NHỜ LILY CT", amount: "562,530", cashier: "Đoàn Nguyễn Quỳnh Như", date: "01/04/2026", isPaid: false },
       { id: "SI5281", room: "5281", arrival: "31/03/2026", departure: "01/04/2026", note: "ĐÃ NHỜ LILY CT", amount: "562,530", cashier: "Đoàn Nguyễn Quỳnh Như", date: "01/04/2026", isPaid: false },
     ],
-    payments: []
+    payments: [
+      { date: "02/04/2026 09:15", method: "Credit Card", note: "Thanh toán cọc đợt 1 - VCC", amount: "10,000,000", user: "Phan Thùy Thảo Ngân" },
+      { date: "02/04/2026 14:30", method: "Bank transfer", note: "Thanh toán phần còn lại - Chuyển khoản Vietcombank", amount: "11,595,907", user: "Đoàn Nguyễn Quỳnh Như" }
+    ]
   },
   {
     id: "vanthong",
@@ -95,18 +122,108 @@ const mockCompanyDebts = [
   }
 ];
 
-const CompanyDebtReportPage = ({ onBack }: CompanyDebtReportPageProps) => {
-  const [selectedCompany, setSelectedCompany] = useState<typeof mockCompanyDebts[0] | null>(null);
+const companyColumns: Column<CompanyDebtRow>[] = [
+  {
+    key: "name",
+    label: "Công ty",
+    sticky: true,
+    width: 140,
+    minWidth: 140,
+    render: (val, row, expanded) => (
+      <div className="flex items-center gap-1.5">
+        <div className="w-4 flex items-center justify-center shrink-0">
+          {expanded ? (
+            <ChevronDown className="w-3.5 h-3.5 text-[#1AB1A5]" />
+          ) : (
+            <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+          )}
+        </div>
+        <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
+        <div className="flex flex-col min-w-0">
+          <span className="text-[8px] font-black text-slate-700 uppercase truncate">
+            {val}
+          </span>
+          {row.remainingDebt === "0" && (
+            <div className="flex items-center gap-0.5">
+              <CheckCircle2 className="w-2 h-2 text-emerald-500 shrink-0" />
+              <span className="text-[6px] font-bold text-emerald-500 uppercase tracking-tighter">Hoàn tất</span>
+            </div>
+          )}
+        </div>
+      </div>
+    ),
+  },
+  {
+    key: "totalDebt",
+    label: "Tổng nợ",
+    minWidth: 85,
+    align: "right",
+    render: (val) => (
+      <span className="text-[8px] font-bold text-slate-500">{val}đ</span>
+    ),
+  },
+  {
+    key: "remainingDebt",
+    label: "Còn lại",
+    minWidth: 85,
+    align: "right",
+    render: (val) => (
+      <span className={cn(
+        "text-[8px] font-black",
+        val !== "0" ? "text-amber-500" : "text-emerald-500"
+      )}>
+        {val}đ
+      </span>
+    ),
+  },
+  {
+    key: "items",
+    label: "Bookings",
+    width: 60,
+    minWidth: 60,
+    align: "center",
+    sortable: false,
+    filterable: false,
+    render: (val) => (
+      <span className="text-[8px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">
+        {(val as DebtItem[]).length}
+      </span>
+    ),
+  },
+  {
+    key: "payments",
+    label: "Đã thanh toán",
+    minWidth: 95,
+    align: "right",
+    sortable: false,
+    filterable: false,
+    render: (val) => {
+      const payments = val as PaymentItem[];
+      const totalPaid = payments.reduce(
+        (sum, p) => sum + parseInt(p.amount.replace(/,/g, "")),
+        0
+      );
+      return payments.length > 0 ? (
+        <div className="text-right">
+          <span className="text-[8px] font-black text-emerald-600">{totalPaid.toLocaleString()}đ</span>
+          <span className="text-[6px] font-bold text-slate-300 block">({payments.length} lần)</span>
+        </div>
+      ) : (
+        <span className="text-[7px] font-bold text-slate-300 italic">Chưa TT</span>
+      );
+    },
+  },
+];
 
-  // Totals from user request
+const CompanyDebtReportPage = ({ onBack }: CompanyDebtReportPageProps) => {
   const grandTotal = "31,403,459";
   const grandRemaining = "23,330,905";
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20 animate-in fade-in duration-500">
-      <header className="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between">
+      <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={onBack}
             className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
           >
@@ -126,7 +243,7 @@ const CompanyDebtReportPage = ({ onBack }: CompanyDebtReportPageProps) => {
         </div>
       </header>
 
-      {/* Hotel Address - Mini */}
+      {/* Hotel Address */}
       <div className="px-3 py-1.5 bg-white border-b border-slate-100">
         <div className="flex items-start gap-1.5">
           <MapPin className="w-3 h-3 text-[#1AB1A5] mt-0.5 shrink-0" />
@@ -138,7 +255,7 @@ const CompanyDebtReportPage = ({ onBack }: CompanyDebtReportPageProps) => {
       </div>
 
       {/* Summary Row */}
-      <div className="px-3 pt-3">
+      <div className="px-3 pt-3 pb-1">
         <div className="bg-slate-800 rounded-xl p-3 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
@@ -156,154 +273,124 @@ const CompanyDebtReportPage = ({ onBack }: CompanyDebtReportPageProps) => {
         </div>
       </div>
 
-      {/* Grid of Companies - 2 Columns */}
-      <div className="p-3 grid grid-cols-2 gap-2">
-        {mockCompanyDebts.map((company) => (
-          <button 
-            key={company.id} 
-            onClick={() => setSelectedCompany(company)}
-            className="bg-white rounded-xl border border-slate-100 p-2.5 flex flex-col shadow-sm active:scale-95 transition-all relative overflow-hidden h-[90px]"
-          >
-            {company.remainingDebt === "0" && (
-              <div className="absolute top-0 right-0 p-1">
-                <div className="bg-emerald-500 rounded-full w-1.5 h-1.5" />
+      {/* Company Table with Expandable Details */}
+      <ReportTable
+        columns={companyColumns}
+        data={mockCompanyDebts}
+        rowKey={(row) => row.id}
+        expandedContent={(row) => (
+          <div className="px-3 py-2 space-y-3">
+            {/* Debt items sub-table */}
+            <div>
+              <div className="flex items-center gap-1.5 text-[7px] font-black text-[#1AB1A5] uppercase tracking-widest mb-1.5">
+                <Receipt className="w-3 h-3" /> Khoản nợ ({row.items.length})
               </div>
-            )}
-            
-            <div className="flex items-center gap-1.5 mb-1.5">
-               <Building2 className="w-3 h-3 text-[#1AB1A5]" />
-               <span className="text-[9px] font-black text-slate-700 uppercase truncate text-left w-full">{company.name}</span>
-            </div>
-
-            <div className="space-y-1 mt-auto w-full">
-               <div className="flex justify-between items-center bg-slate-50 px-1.5 py-1 rounded">
-                  <span className="text-[6px] font-black text-slate-300 uppercase tracking-widest leading-none">Nợ:</span>
-                  <span className={cn(
-                    "text-[9px] font-black leading-none font-mono tracking-tighter",
-                    company.remainingDebt !== "0" ? "text-amber-500" : "text-emerald-500"
-                  )}>
-                    {company.remainingDebt}đ
-                  </span>
-               </div>
-               <p className="text-[7px] font-bold text-slate-400 text-right font-mono tracking-tighter">{company.totalDebt}đ</p>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* Detail Sheet - Drawer from bottom */}
-      <Sheet open={!!selectedCompany} onOpenChange={(open) => !open && setSelectedCompany(null)}>
-        <SheetContent side="bottom" className="rounded-t-[1.5rem] p-0 border-t-0 shadow-2xl max-h-[95vh] overflow-y-auto max-w-md mx-auto left-0 right-0">
-          {selectedCompany && (
-            <div className="p-4 pt-8 space-y-4">
-              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-8 h-1 bg-slate-200 rounded-full" />
-              
-              <SheetHeader className="text-left">
-                <div className="flex items-center justify-between">
-                  <div className="w-[80%]">
-                    <SheetTitle className="text-base font-black text-slate-800 uppercase tracking-tighter leading-tight">
-                      CÔNG NỢ {selectedCompany.name}
-                    </SheetTitle>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <div className={cn(
-                        "px-1.5 py-0.5 rounded text-[8px] font-black border flex items-center gap-1",
-                        selectedCompany.remainingDebt !== "0" ? "bg-amber-50 text-amber-500 border-amber-100" : "bg-emerald-50 text-emerald-500 border-emerald-100"
-                      )}>
-                         {selectedCompany.remainingDebt !== "0" ? <AlertCircle className="w-2.5 h-2.5" /> : <CheckCircle2 className="w-2.5 h-2.5" />}
-                         {selectedCompany.remainingDebt !== "0" ? `NỢ CÒN LẠI: ${selectedCompany.remainingDebt}đ` : "ĐÃ THANH TOÁN HẾT"}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-10 h-10 bg-[#1AB1A5]/10 rounded-xl flex items-center justify-center text-[#1AB1A5] shrink-0">
-                    <Building2 className="w-5 h-5" />
-                  </div>
-                </div>
-              </SheetHeader>
-
-              {/* Debt Items List */}
-              <div className="space-y-2">
-                 <div className="flex items-center gap-1.5 text-[8px] font-black text-[#1AB1A5] uppercase tracking-widest pl-1">
-                    <Receipt className="w-3.5 h-3.5" /> Khoản nợ chi tiết ({selectedCompany.items.length})
-                 </div>
-                 <div className="space-y-1.5">
-                  {selectedCompany.items.map((item, idx) => (
-                    <div key={idx} className="bg-white rounded-xl p-3 border border-slate-100 shadow-sm space-y-1.5">
-                        <div className="flex items-center justify-between border-b border-slate-50 pb-1.5">
-                          <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-black text-[#1AB1A5]">#{item.id}</span>
-                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Phòng {item.room}</span>
-                          </div>
+              <div className="bg-white rounded-lg border border-slate-100 overflow-hidden">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-slate-50">
+                      <th className="px-2 py-1 text-[6px] font-black text-slate-400 uppercase tracking-wider text-left">Mã</th>
+                      <th className="px-2 py-1 text-[6px] font-black text-slate-400 uppercase tracking-wider text-left">Lưu trú</th>
+                      <th className="px-2 py-1 text-[6px] font-black text-slate-400 uppercase tracking-wider text-right">Số tiền</th>
+                      <th className="px-2 py-1 text-[6px] font-black text-slate-400 uppercase tracking-wider text-left">Thu ngân</th>
+                      <th className="px-2 py-1 text-[6px] font-black text-slate-400 uppercase tracking-wider text-left">Ghi chú</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {row.items.map((item, idx) => (
+                      <tr key={idx} className={cn("border-t border-slate-50", idx % 2 === 1 && "bg-slate-50/30")}>
+                        <td className="px-2 py-1">
+                          <span className="text-[7px] font-black text-[#1AB1A5]">#{item.id}</span>
+                        </td>
+                        <td className="px-2 py-1">
+                          <span className="text-[7px] font-bold text-slate-500">{item.arrival} → {item.departure}</span>
+                        </td>
+                        <td className="px-2 py-1 text-right">
                           <span className={cn(
-                            "text-[10px] font-black font-mono tracking-tighter",
+                            "text-[7px] font-black",
                             item.isPaid ? "text-emerald-500" : "text-amber-500"
                           )}>
                             {item.amount}đ
                           </span>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-                          <div className="space-y-0.5">
-                            <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest leading-none">Ngày lưu trú</p>
-                            <p className="text-[9px] font-bold text-slate-600 leading-none">{item.arrival} - {item.departure}</p>
-                          </div>
-                          <div className="space-y-0.5">
-                            <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest leading-none">Thu ngân / Ngày</p>
-                            <p className="text-[8px] font-bold text-slate-600 leading-none truncate">{item.cashier}</p>
-                            <p className="text-[7px] font-bold text-slate-400 mt-0.5">{item.date}</p>
-                          </div>
-                          <div className="space-y-0.5 col-span-2 mt-1 bg-slate-50/50 p-1.5 rounded-lg border border-slate-100/50">
-                            <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1 flex items-center gap-1">
-                               <FileText className="w-2.5 h-2.5" /> Ghi chú
-                            </p>
-                            <p className="text-[9px] font-bold text-slate-500 italic leading-snug">"{item.note}"</p>
-                          </div>
-                        </div>
-                    </div>
-                  ))}
-                 </div>
-              </div>
-
-              {/* Payment History List */}
-              {selectedCompany.payments.length > 0 && (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-[8px] font-black text-blue-500 uppercase tracking-widest pl-1 mt-2">
-                      <CreditCard className="w-3.5 h-3.5" /> Lịch sử thanh toán
-                  </div>
-                  <div className="space-y-1.5">
-                    {selectedCompany.payments.map((pay, idx) => (
-                      <div key={idx} className="bg-blue-50/40 rounded-xl p-3 border border-blue-100 shadow-sm space-y-1.5">
-                        <div className="flex items-center justify-between border-b border-blue-100/30 pb-1.5">
-                            <div className="flex items-center gap-1">
-                              <Banknote className="w-3 h-3 text-blue-500" />
-                              <span className="text-[9px] font-black text-blue-600 uppercase tracking-tight">{pay.method}</span>
-                            </div>
-                            <span className="text-[10px] font-black text-blue-600 font-mono tracking-tighter">{pay.amount}đ</span>
-                        </div>
-                        <div className="space-y-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[8px] font-bold text-blue-400">{pay.date}</span>
-                              <span className="text-[8px] font-bold text-blue-600/60 uppercase">NV: {pay.user}</span>
-                            </div>
-                            <div className="bg-white/40 p-2 rounded-lg border border-blue-100/20">
-                               <p className="text-[9px] font-bold text-blue-700/80 italic leading-snug">"{pay.note}"</p>
-                            </div>
-                        </div>
-                      </div>
+                        </td>
+                        <td className="px-2 py-1">
+                          <span className="text-[6px] font-bold text-slate-400 truncate block max-w-[80px]">{item.cashier}</span>
+                        </td>
+                        <td className="px-2 py-1">
+                          <span className="text-[6px] font-bold text-slate-400 italic truncate block max-w-[100px]">{item.note}</span>
+                        </td>
+                      </tr>
                     ))}
-                  </div>
-                </div>
-              )}
-
-              <button 
-                onClick={() => setSelectedCompany(null)}
-                className="w-full h-11 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-[0.97] transition-all shadow-lg shadow-slate-200 mt-2"
-              >
-                QUAY LẠI DANH SÁCH
-              </button>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          )}
-        </SheetContent>
-      </Sheet>
+
+            {/* Payment history - Bill style */}
+            {row.payments.length > 0 && (
+              <div>
+                <div className="flex items-center gap-1.5 text-[7px] font-black text-blue-500 uppercase tracking-widest mb-1.5">
+                  <CreditCard className="w-3 h-3" /> Chi tiết thanh toán ({row.payments.length} lần)
+                </div>
+                <div className="bg-white rounded-lg border border-blue-100 overflow-hidden">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-blue-50">
+                        <th className="px-1.5 py-1 text-[6px] font-black text-blue-400 uppercase tracking-wider text-center w-6">#</th>
+                        <th className="px-1.5 py-1 text-[6px] font-black text-blue-400 uppercase tracking-wider text-left">Ngày giờ</th>
+                        <th className="px-1.5 py-1 text-[6px] font-black text-blue-400 uppercase tracking-wider text-left">Hình thức</th>
+                        <th className="px-1.5 py-1 text-[6px] font-black text-blue-400 uppercase tracking-wider text-right">Số tiền</th>
+                        <th className="px-1.5 py-1 text-[6px] font-black text-blue-400 uppercase tracking-wider text-left">NV thu</th>
+                        <th className="px-1.5 py-1 text-[6px] font-black text-blue-400 uppercase tracking-wider text-left">Nội dung</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {row.payments.map((pay, idx) => (
+                        <tr key={idx} className={cn("border-t border-blue-50", idx % 2 === 1 && "bg-blue-50/20")}>
+                          <td className="px-1.5 py-1.5 text-center">
+                            <span className="text-[7px] font-black text-blue-400">{idx + 1}</span>
+                          </td>
+                          <td className="px-1.5 py-1.5">
+                            <span className="text-[7px] font-bold text-slate-700 whitespace-nowrap">{pay.date}</span>
+                          </td>
+                          <td className="px-1.5 py-1.5">
+                            <span className="inline-flex items-center gap-0.5 text-[6px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase whitespace-nowrap">
+                              <Banknote className="w-2 h-2" />
+                              {pay.method}
+                            </span>
+                          </td>
+                          <td className="px-1.5 py-1.5 text-right">
+                            <span className="text-[8px] font-black text-emerald-600 whitespace-nowrap">{pay.amount}đ</span>
+                          </td>
+                          <td className="px-1.5 py-1.5">
+                            <span className="text-[6px] font-bold text-slate-500 truncate block max-w-[80px]">{pay.user}</span>
+                          </td>
+                          <td className="px-1.5 py-1.5">
+                            <span className="text-[6px] font-bold text-slate-400 italic leading-tight block">{pay.note}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t-2 border-blue-200 bg-blue-50/50">
+                        <td colSpan={3} className="px-1.5 py-1.5 text-right">
+                          <span className="text-[7px] font-black text-blue-500 uppercase tracking-widest">Tổng đã TT:</span>
+                        </td>
+                        <td className="px-1.5 py-1.5 text-right">
+                          <span className="text-[8px] font-black text-emerald-600">
+                            {row.payments.reduce((sum, p) => sum + parseInt(p.amount.replace(/,/g, "")), 0).toLocaleString()}đ
+                          </span>
+                        </td>
+                        <td colSpan={2}></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      />
     </div>
   );
 };
